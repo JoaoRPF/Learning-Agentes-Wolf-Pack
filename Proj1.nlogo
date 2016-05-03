@@ -1,3 +1,7 @@
+;;__includes["file.nls", " ", ...]
+
+
+
 ;;;
 ;;;  Global variables and constants
 ;;;
@@ -129,30 +133,6 @@ to setup-patches
   ask patches [
     set kind ROOM_FLOOR
     set pcolor gray + 4 ]
-
-
-  let wall1 n-values (MAPBOUNDS + 1) [0 - ?]
-  let wall2 n-values MAPBOUNDS [1 + ?]
-
-  foreach wall1
-    [ ask patch ? (0 - MAPBOUNDS) [set pcolor black]
-      ask patch ? (0 - MAPBOUNDS) [set kind WALL]
-      ask patch ? MAPBOUNDS [set pcolor black]
-      ask patch ? MAPBOUNDS [set kind WALL]
-      ask patch (0 - MAPBOUNDS) ? [set pcolor black]
-      ask patch (0 - MAPBOUNDS) ? [set kind WALL]
-      ask patch MAPBOUNDS ? [set pcolor black]
-      ask patch MAPBOUNDS ? [set kind WALL]]
-
-  foreach wall2
-    [ ask patch ? (0 - MAPBOUNDS) [set pcolor black]
-      ask patch ? (0 - MAPBOUNDS) [set kind WALL]
-      ask patch ? MAPBOUNDS [set pcolor black]
-      ask patch ? MAPBOUNDS [set kind WALL]
-      ask patch (0 - MAPBOUNDS) ? [set pcolor black]
-      ask patch (0 - MAPBOUNDS) ? [set kind WALL]
-      ask patch MAPBOUNDS ? [set pcolor black]
-      ask patch MAPBOUNDS ? [set kind WALL]]
 end
 
 ;;;
@@ -221,7 +201,7 @@ to redHood-loop
 
   let rand random 10
   ifelse (rand <= 8)
-  [move-ahead]
+    [move-ahead]
   [rotate]
 end
 
@@ -236,12 +216,11 @@ end
 ;;;  Move the robot forward
 ;;;
 to move-ahead
-  let ahead (patch-ahead 1)
-  ;; check if the cell is free
-  if ([kind] of ahead = ROOM_FLOOR) and (not any? turtles-on ahead)
+  ifelse free-floor-ahead?
   [
     fd 1
   ]
+  [rotate]
 end
 
 ;;;
@@ -289,11 +268,22 @@ end
 ;;; ------------------------
 ;;;
 
+
+;;;
+;;; check free floor
+;;;
+to-report free-floor-ahead?
+    let ahead (patch-ahead 1)
+  ;; check if the cell is free
+     report ([kind] of ahead = ROOM_FLOOR) and (not any? turtles-on ahead)
+end
+
+
 ;;;
 ;;;check redHood
 ;;;
 to-report redHood-around?
-  let goal redHoods in-cone 2 360
+  let goal redHoods in-cone 4 360
   report (any? goal)
 
   ;let goal [ ask patches in-cone 2 360 ]
@@ -368,14 +358,45 @@ to wolf-loop2
     [rotate]
    ]
 end
+
+to setup-patches2
+  ;; Build the floor
+  ask patches [
+    set kind ROOM_FLOOR
+    set pcolor gray + 4 ]
+
+
+  let wall1 n-values (MAPBOUNDS + 1) [0 - ?]
+  let wall2 n-values MAPBOUNDS [1 + ?]
+
+  foreach wall1
+    [ ask patch ? (0 - MAPBOUNDS) [set pcolor black]
+      ask patch ? (0 - MAPBOUNDS) [set kind WALL]
+      ask patch ? MAPBOUNDS [set pcolor black]
+      ask patch ? MAPBOUNDS [set kind WALL]
+      ask patch (0 - MAPBOUNDS) ? [set pcolor black]
+      ask patch (0 - MAPBOUNDS) ? [set kind WALL]
+      ask patch MAPBOUNDS ? [set pcolor black]
+      ask patch MAPBOUNDS ? [set kind WALL]]
+
+  foreach wall2
+    [ ask patch ? (0 - MAPBOUNDS) [set pcolor black]
+      ask patch ? (0 - MAPBOUNDS) [set kind WALL]
+      ask patch ? MAPBOUNDS [set pcolor black]
+      ask patch ? MAPBOUNDS [set kind WALL]
+      ask patch (0 - MAPBOUNDS) ? [set pcolor black]
+      ask patch (0 - MAPBOUNDS) ? [set kind WALL]
+      ask patch MAPBOUNDS ? [set pcolor black]
+      ask patch MAPBOUNDS ? [set kind WALL]]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
 10
-649
-470
-16
-16
+493
+314
+10
+10
 13.0
 1
 10
@@ -386,10 +407,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--16
-16
--16
-16
+-10
+10
+-10
+10
 0
 0
 1
@@ -456,7 +477,7 @@ MAPBOUNDS
 MAPBOUNDS
 3
 15
-11
+15
 1
 1
 NIL
