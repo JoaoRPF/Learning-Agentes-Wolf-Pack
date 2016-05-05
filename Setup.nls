@@ -1,0 +1,140 @@
+;;;
+;;;  Global variables and constants
+;;;
+globals [ROOM_FLOOR WALL]
+
+;;;
+;;;  Declare two types of turtles
+;;;
+breed [ wolfs wolf ]
+breed [ redHoods redHood ]
+
+;;;
+;;;  Declare cells' properties
+;;;
+patches-own [kind]
+
+;;;
+;;;  Reset the simulation
+;;;
+to reset
+  ;; (for this model to work with NetLogo's new plotting features,
+  ;; __clear-all-and-reset-ticks should be replaced with clear-all at
+  ;; the beginning of your setup procedure and reset-ticks at the end
+  ;; of the procedure.)
+  ;;__clear-all-and-reset-ticks
+  clear-all
+  reset-ticks
+  set-globals
+  setup-patches
+  setup-turtles
+  ;;ask wolfs [init-wolf]
+end
+
+;;;
+;;;  Setup all the agents.
+;;;
+to setup-turtles
+
+   set-default-shape redHoods "default"
+
+  create-redHoods 1
+
+  ;; set redHood 1
+  ask turtle 0 [set color red]
+  ask turtle 0 [set xcor 0]
+  ask turtle 0 [set ycor 0]
+  ask turtle 0 [set heading 90]
+
+  set-default-shape wolfs "default"
+
+  create-wolfs 4
+
+  ;; set wolf 1
+  ask turtle 1 [set color blue]
+
+  let px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  let py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+
+  let p patch px py
+
+  while [any? turtles-on p]
+  [set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set p patch px py]
+
+  ask turtle 1 [set xcor px]
+  ask turtle 1 [set ycor py]
+  ask turtle 1 [set heading 90]
+
+  ;; set wolf 2
+  ask turtle 2 [set color blue]
+
+  set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+
+  set p patch px py
+
+  while [any? turtles-on p]
+  [set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set p patch px py]
+
+  ask turtle 2 [set xcor px]
+  ask turtle 2 [set ycor py]
+  ask turtle 2 [set heading 90]
+
+  ;; set wolf 3
+  ask turtle 3 [set color blue]
+
+  set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+
+  set p patch px py
+
+  while [any? turtles-on p]
+  [set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set p patch px py]
+
+  ask turtle 3 [set xcor px]
+  ask turtle 3 [set ycor py]
+  ask turtle 3 [set heading 90]
+
+  ;; set wolf 4
+
+  set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+
+  set p patch px py
+
+  while [any? turtles-on p]
+  [set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set p patch px py]
+
+  ask turtle 4 [set color blue]
+  ask turtle 4 [set xcor px]
+  ask turtle 4 [set ycor py]
+  ask turtle 4 [set heading 90]
+
+end
+
+
+;;;
+;;;  Setup the environment. Populate the room.
+;;;
+to setup-patches
+  ;; Build the floor
+  ask patches [
+    set kind ROOM_FLOOR
+    set pcolor gray + 4 ]
+end
+
+;;;
+;;;  Set global variables' values
+;;;
+to set-globals
+  set ROOM_FLOOR 0
+  set WALL 1
+end

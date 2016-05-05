@@ -1,0 +1,6 @@
+;;;
+;;;  Robot's updating procedure, which defines the rules of its behaviors
+;;;
+to deliberative-wolf-loop
+  
+end

@@ -1,147 +1,6 @@
-;;__includes["file.nls", " ", ...]
-
-
-
-;;;
-;;;  Global variables and constants
-;;;
-globals [ROOM_FLOOR WALL]
-
-;;;
-;;;  Declare two types of turtles
-;;;
-breed [ wolfs wolf ]
-breed [ redHoods redHood ]
-
-;;;
-;;;  Declare cells' properties
-;;;
-patches-own [kind]
-
-;;;
-;;;  Reset the simulation
-;;;
-to reset
-  ;; (for this model to work with NetLogo's new plotting features,
-  ;; __clear-all-and-reset-ticks should be replaced with clear-all at
-  ;; the beginning of your setup procedure and reset-ticks at the end
-  ;; of the procedure.)
-  ;;__clear-all-and-reset-ticks
-  clear-all
-  reset-ticks
-  set-globals
-  setup-patches
-  setup-turtles
-  ;;ask wolfs [init-wolf]
-end
-
-;;;
-;;;  Setup all the agents.
-;;;
-to setup-turtles
-
-   set-default-shape redHoods "default"
-
-  create-redHoods 1
-
-  ;; set redHood 1
-  ask turtle 0 [set color red]
-  ask turtle 0 [set xcor 0]
-  ask turtle 0 [set ycor 0]
-  ask turtle 0 [set heading 90]
-
-  set-default-shape wolfs "default"
-
-  create-wolfs 4
-
-  ;; set wolf 1
-  ask turtle 1 [set color blue]
-
-  let px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-  let py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-
-  let p patch px py
-
-  while [any? turtles-on p]
-  [set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-  set p patch px py]
-
-  ask turtle 1 [set xcor px]
-  ask turtle 1 [set ycor py]
-  ask turtle 1 [set heading 90]
-
-  ;; set wolf 2
-  ask turtle 2 [set color blue]
-
-  set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-
-  set p patch px py
-
-  while [any? turtles-on p]
-  [set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-  set p patch px py]
-
-  ask turtle 2 [set xcor px]
-  ask turtle 2 [set ycor py]
-  ask turtle 2 [set heading 90]
-
-  ;; set wolf 3
-  ask turtle 3 [set color blue]
-
-  set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-
-  set p patch px py
-
-  while [any? turtles-on p]
-  [set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-  set p patch px py]
-
-  ask turtle 3 [set xcor px]
-  ask turtle 3 [set ycor py]
-  ask turtle 3 [set heading 90]
-
-  ;; set wolf 4
-
-  set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-
-  set p patch px py
-
-  while [any? turtles-on p]
-  [set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
-  set p patch px py]
-
-  ask turtle 4 [set color blue]
-  ask turtle 4 [set xcor px]
-  ask turtle 4 [set ycor py]
-  ask turtle 4 [set heading 90]
-
-end
-
-
-;;;
-;;;  Setup the environment. Populate the room.
-;;;
-to setup-patches
-  ;; Build the floor
-  ask patches [
-    set kind ROOM_FLOOR
-    set pcolor gray + 4 ]
-end
-
-;;;
-;;;  Set global variables' values
-;;;
-to set-globals
-  set ROOM_FLOOR 0
-  set WALL 1
-end
+__includes["Setup.nls"
+           "ReactiveAgents.nls"
+           "DeliberativeAgents.nls"]
 
 
 ;;;
@@ -160,7 +19,10 @@ to go
   if parou [stop]
 
   ask wolfs [
-      wolf-loop
+    if Agent-Mode = "Reactive"
+      [reactive-wolf-loop]
+    if Agent-Mode = "Deliberative"
+    [deliberative-wolf-loop]
   ]
 end
 
@@ -174,145 +36,22 @@ to-report is-surrounded
   report sum [count turtles-here] of neighbors4 = 4 - c
 end
 
-;;;
-;;;  Robot's updating procedure, which defines the rules of its behaviors
-;;;
-to wolf-loop
-
-  ifelse redHood-around?
-  [
-    set color orange
-    turn-goal
-    move-ahead
-   ]
-  [
-    set color blue
-    let rand random 10
-    ifelse (rand <= 8)
-    [move-ahead]
-    [rotate]
-   ]
-end
-
-to redHood-loop
-
-   if is-surrounded
-   [ stop ]
-
-  let rand random 10
-  ifelse (rand <= 8)
-    [move-ahead]
-  [rotate]
-end
-
-
-;;;
-;;; ------------------------
-;;;   Actuators
-;;; ------------------------
-;;;
-
-;;;
-;;;  Move the robot forward
-;;;
-to move-ahead
-  ifelse free-floor-ahead?
-  [
-    fd 1
-  ]
-  [rotate]
-end
-
-;;;
-;;;  Turn robot to goal
-;;;
-to turn-goal
-  let goalX [xcor] of turtle 0 - xcor
-  let goalY [ycor] of turtle 0 - ycor
-
-    ifelse abs(goalX) = abs(goalY)
-    [let rand random 10
-      ifelse rand < 5
-      [ifelse goalX > 0
-        [set heading 90]
-        [set heading 270]
-        ]
-      [ifelse goalY > 0
-        [set heading 0]
-        [set heading 180]
-        ]
-      ]
-    [ifelse abs(goalX) > abs(goalY)
-      [ifelse goalX > 0
-        [set heading 90]
-        [set heading 270]
-        ]
-      [ifelse goalY > 0
-        [set heading 0]
-        [set heading 180]
-        ]
-     ]
-end
-
-;;;
-;;; Rotate robot
-;;;
-to rotate
-  rt 90
-end
 
 
 
-;;; ------------------------
-;;;   Sensors
-;;; ------------------------
-;;;
 
 
-;;;
-;;; check free floor
-;;;
-to-report free-floor-ahead?
-    let ahead (patch-ahead 1)
-  ;; check if the cell is free
-     report ([kind] of ahead = ROOM_FLOOR) and (not any? turtles-on ahead)
-end
 
 
-;;;
-;;;check redHood
-;;;
-to-report redHood-around?
-  let goal redHoods in-cone 4 360
-  report (any? goal)
 
-  ;let goal [ ask patches in-cone 2 360 ]
-  ;report(any? redHoods-on goal)
-end
 
-;;;
-;;;check wall-ahead
-;;;
-to-report wall-ahead?
-  let ahead (patch-ahead 1)
-  report ([kind]of ahead = WALL)
-end
 
-;;;
-;;;check wolf
-;;;
-to-report wolf-ahead?
-  let ahead (patch-ahead 1)
-  report(any? wolfs-on ahead)
-end
 
-;;;
-;;;check redHood
-;;;
-to-report redHood-ahead?
-  let ahead (patch-ahead 1)
-  report(any? wolfs-on ahead)
-end
+
+
+
+
+
 
 
 ;;
@@ -320,7 +59,7 @@ end
 ;;
 to wolf-loop2
 
-  ifelse redHood-around?
+  ifelse redHood-in-sight-90?
   [
 
     turn-goal
@@ -355,7 +94,7 @@ to wolf-loop2
     let rand random 10
     ifelse (rand <= 8)
     [move-ahead]
-    [rotate]
+    [rotate-right]
    ]
 end
 
@@ -393,10 +132,10 @@ end
 GRAPHICS-WINDOW
 210
 10
-493
-314
-10
-10
+455
+210
+6
+6
 13.0
 1
 10
@@ -407,10 +146,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--10
-10
--10
-10
+-6
+6
+-6
+6
 0
 0
 1
@@ -470,14 +209,39 @@ NIL
 
 SLIDER
 10
-124
+171
 182
-157
+204
+MAX_VISION
+MAX_VISION
+1
+4
+4
+1
+1
+NIL
+HORIZONTAL
+
+CHOOSER
+21
+217
+159
+262
+Agent-Mode
+Agent-Mode
+"Reactive" "Deliberative" "Learning"
+1
+
+SLIDER
+12
+117
+184
+150
 MAPBOUNDS
 MAPBOUNDS
-3
-15
-15
+0
+100
+50
 1
 1
 NIL
