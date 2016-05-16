@@ -1,7 +1,7 @@
 ;;;
 ;;;  Global variables and constants
 ;;;
-globals [ROOM_FLOOR WALL]
+globals [averageSteps totalSteps episodes ROOM_FLOOR WALL]
 
 ;;;
 ;;;  Declare two types of turtles
@@ -15,6 +15,11 @@ breed [ redHoods redHood ]
 patches-own [kind]
 
 ;;;
+;;;  Declare turtles' properties
+;;;
+wolfs-own [last-rh-pos]
+
+;;;
 ;;;  Reset the simulation
 ;;;
 to reset
@@ -26,6 +31,23 @@ to reset
   clear-all
   reset-ticks
   set-globals
+  setup-patches
+  setup-turtles
+  ;;ask wolfs [init-wolf]
+end
+
+;;;
+;;;  Reset the simulation
+;;;
+to restart
+  ;; (for this model to work with NetLogo's new plotting features,
+  ;; __clear-all-and-reset-ticks should be replaced with clear-all at
+  ;; the beginning of your setup procedure and reset-ticks at the end
+  ;; of the procedure.)
+  ;;__clear-all-and-reset-ticks
+  clear-patches
+  clear-turtles
+  reset-ticks
   setup-patches
   setup-turtles
   ;;ask wolfs [init-wolf]
@@ -66,9 +88,10 @@ to setup-turtles
   ask turtle 1 [set xcor px]
   ask turtle 1 [set ycor py]
   ask turtle 1 [set heading 90]
+  ask turtle 1 [set last-rh-pos []]
 
   ;; set wolf 2
-  ask turtle 2 [set color blue]
+  ask turtle 2 [set color green]
 
   set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
   set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
@@ -83,9 +106,10 @@ to setup-turtles
   ask turtle 2 [set xcor px]
   ask turtle 2 [set ycor py]
   ask turtle 2 [set heading 90]
+  ask turtle 2 [set last-rh-pos []]
 
   ;; set wolf 3
-  ask turtle 3 [set color blue]
+  ask turtle 3 [set color black]
 
   set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
   set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
@@ -100,6 +124,7 @@ to setup-turtles
   ask turtle 3 [set xcor px]
   ask turtle 3 [set ycor py]
   ask turtle 3 [set heading 90]
+  ask turtle 3 [set last-rh-pos []]
 
   ;; set wolf 4
 
@@ -113,10 +138,11 @@ to setup-turtles
   set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
   set p patch px py]
 
-  ask turtle 4 [set color blue]
+  ask turtle 4 [set color gray]
   ask turtle 4 [set xcor px]
   ask turtle 4 [set ycor py]
   ask turtle 4 [set heading 90]
+  ask turtle 4 [set last-rh-pos []]
 
 end
 
@@ -135,6 +161,9 @@ end
 ;;;  Set global variables' values
 ;;;
 to set-globals
+  set averageSteps 0
+  set totalSteps 0
+  set episodes 0
   set ROOM_FLOOR 0
   set WALL 1
 end

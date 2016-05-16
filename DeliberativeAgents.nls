@@ -3,21 +3,27 @@
 ;;;
 to deliberative-wolf-loop
   let rand random 10
+  if (not empty? last-rh-pos) and (xcor = item 0 last-rh-pos ) and (ycor = item 1 last-rh-pos)
+     [set last-rh-pos []]
   ifelse redHood-in-sight-90? and free-floor-ahead?
     [move-ahead]
     [ifelse redHood-in-sight-360?
-      [turn-goal]
-      [ifelse (rand <= 5)
-        [move-ahead]
-        [ifelse rand <= 7.5 
-          [rotate-right]
-          [rotate-left]
+      [turn-goal [xcor] of turtle 0 [ycor] of turtle 0]
+      [ifelse (not empty? last-rh-pos)
+        [seek-pos]
+        [ifelse ((rand <= 5) and free-floor-ahead?)
+          [move-ahead]
+          [ifelse rand <= 7.5 
+            [rotate-right]
+            [rotate-left]
+          ]
         ]
       ]
     ]
-  ifelse redHood-in-sight-360?
-    [set color orange]
-    [set color blue]
+    
+;  ifelse redHood-in-sight-360?
+ ;   [set color orange]
+  ;  [set color blue]
       
 end
 
@@ -26,10 +32,12 @@ end
 ;;;
 ;;;  Turn robot to goal
 ;;;
-to turn-goal
-  let goalX [xcor] of turtle 0 - xcor
-  let goalY [ycor] of turtle 0 - ycor
-
+to turn-goal [x y]
+  let goalX x - xcor
+  let goalY y - ycor
+  
+  set last-rh-pos list x y
+  
     ifelse abs(goalX) = abs(goalY)
     [let rand random 10
       ifelse rand < 5
@@ -52,4 +60,37 @@ to turn-goal
         [set heading 180]
         ]
      ]
+end
+
+;;;
+;;;  seek last known position for redHood
+;;;
+to seek-pos
+  let goalX item 0 last-rh-pos - xcor
+  let goalY item 1 last-rh-pos - ycor
+  let headingX -1
+  let headingY -1
+  
+ ; print("seeking pos !! ")
+ ; print (who)
+  
+  if not (goalX = 0)
+  [ifelse goalX > 0
+   [set headingX 90]
+   [set headingX 270]
+  ]
+   
+  if not (goalY = 0)
+  [ifelse goalY > 0
+    [set headingY 0]
+    [set headingY 180]
+  ]
+  
+  ifelse (((headingX = heading) or (headingY = heading)) and (free-floor-ahead?))
+  [move-ahead]
+  [turn-goal item 0 last-rh-pos item 1 last-rh-pos]
+  
+  if (headingX = -1) and (headingY = -1)
+   [set last-rh-pos []]
+  
 end

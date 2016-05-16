@@ -16,7 +16,18 @@ to go
     redHood-loop
   ]
 
-  if parou [stop]
+  if parou
+  [ifelse(episodes = 50)
+    [
+      set averageSteps (averageSteps / episodes)
+      stop]
+    [set episodes (episodes + 1)
+      set totalSteps ticks
+      set averageSteps averageSteps + totalSteps
+      restart
+      go
+    ]
+  ]
 
   ask wolfs [
     if Agent-Mode = "Reactive"
@@ -43,7 +54,7 @@ to redHood-loop
    [ stop ]
 
   let rand random 10
-  ifelse (rand <= 8)
+  ifelse (rand <= 8) and (free-floor-ahead? )
     [move-ahead]
     [ifelse rand <= 9
       [rotate-left]
@@ -77,7 +88,6 @@ to wolf-loop2
   ifelse redHood-in-sight-90?
   [
 
-    turn-goal
 
     let goalX [xcor] of turtle 0 - xcor
     let goalY [ycor] of turtle 0 - ycor
@@ -189,9 +199,9 @@ NIL
 1
 
 BUTTON
-2
+4
 43
-66
+68
 76
 NIL
 Reset
@@ -230,8 +240,8 @@ SLIDER
 MAX_VISION
 MAX_VISION
 1
-4
-4
+max-pxcor
+5
 1
 1
 NIL
@@ -256,11 +266,40 @@ MAPBOUNDS
 MAPBOUNDS
 0
 100
-50
+27
 1
 1
 NIL
 HORIZONTAL
+
+PLOT
+430
+15
+765
+232
+Pursuit Time
+Episode
+Ticks
+0.0
+50.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"default" 1.0 1 -13840069 true "" "plotxy (episodes) (totalSteps)"
+
+MONITOR
+776
+16
+877
+65
+Average Ticks
+averageSteps
+3
+1
+12
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -605,7 +644,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.3.1
+NetLogo 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
