@@ -266,7 +266,7 @@ MAPBOUNDS
 MAPBOUNDS
 0
 100
-27
+22
 1
 1
 NIL
@@ -281,7 +281,7 @@ Pursuit Time
 Episode
 Ticks
 0.0
-50.0
+51.0
 0.0
 1.0
 true
@@ -300,6 +300,17 @@ averageSteps
 3
 1
 12
+
+SWITCH
+22
+273
+170
+306
+memory-last-pos
+memory-last-pos
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?

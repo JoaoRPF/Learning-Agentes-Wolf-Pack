@@ -6,7 +6,8 @@ to deliberative-wolf-loop
   if (not empty? last-rh-pos) and (xcor = item 0 last-rh-pos ) and (ycor = item 1 last-rh-pos)
      [set last-rh-pos []]
   ifelse redHood-in-sight-90? and free-floor-ahead?
-    [move-ahead]
+    [ if (memory-last-pos) [set last-rh-pos list [xcor] of turtle 0 [ycor] of turtle 0]
+      move-ahead]
     [ifelse redHood-in-sight-360?
       [turn-goal [xcor] of turtle 0 [ycor] of turtle 0]
       [ifelse (not empty? last-rh-pos)
@@ -36,7 +37,7 @@ to turn-goal [x y]
   let goalX x - xcor
   let goalY y - ycor
   
-  set last-rh-pos list x y
+  if(memory-last-pos) [set last-rh-pos list x y]
   
     ifelse abs(goalX) = abs(goalY)
     [let rand random 10
