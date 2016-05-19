@@ -17,7 +17,7 @@ to go
   ]
 
   if parou
-  [ifelse(episodes = 50)
+  [ifelse(episodes = 10)
     [
       set averageSteps (averageSteps / episodes)
       stop]
@@ -157,10 +157,10 @@ end
 GRAPHICS-WINDOW
 210
 10
-455
-210
-6
-6
+545
+366
+12
+12
 13.0
 1
 10
@@ -171,10 +171,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--6
-6
--6
-6
+-12
+12
+-12
+12
 0
 0
 1
@@ -241,7 +241,7 @@ MAX_VISION
 MAX_VISION
 1
 max-pxcor
-5
+6
 1
 1
 NIL
@@ -273,10 +273,10 @@ NIL
 HORIZONTAL
 
 PLOT
-430
-15
-765
-232
+565
+98
+900
+315
 Pursuit Time
 Episode
 Ticks

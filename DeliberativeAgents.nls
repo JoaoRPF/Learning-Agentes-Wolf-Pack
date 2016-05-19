@@ -3,6 +3,7 @@
 ;;;
 to deliberative-wolf-loop
   let rand random 10
+  
   if (not empty? last-rh-pos) and (xcor = item 0 last-rh-pos ) and (ycor = item 1 last-rh-pos)
      [set last-rh-pos []]
   ifelse redHood-in-sight-90? and free-floor-ahead?
@@ -22,9 +23,11 @@ to deliberative-wolf-loop
       ]
     ]
     
-;  ifelse redHood-in-sight-360?
- ;   [set color orange]
-  ;  [set color blue]
+  ifelse redHood-in-sight-360?
+    [set color orange]
+    [ifelse (not empty? last-rh-pos)
+    [set color green]
+    [set color blue]]
       
 end
 
@@ -36,30 +39,66 @@ end
 to turn-goal [x y]
   let goalX x - xcor
   let goalY y - ycor
+  let otherGoalX max-pxcor - abs(goalX)
+  let otherGoalY max-pycor - abs (goalY)
+  let compareX 0
+  let compareY 0
+  
+  ifelse (otherGoalX >= abs(goalX))
+  [set compareX goalX]
+  [set compareX otherGoalX]
+  
+  ifelse (otherGoalY >= abs(goalY))
+  [set compareY goalY]
+  [set compareY otherGoalY]
   
   if(memory-last-pos) [set last-rh-pos list x y]
   
-    ifelse abs(goalX) = abs(goalY)
+  ifelse abs(compareX) = abs(compareY)
     [let rand random 10
       ifelse rand < 5
       [ifelse goalX > 0
-        [set heading 90]
-        [set heading 270]
+        [ifelse (otherGoalX > goalX)
+          [set heading 90]
+          [set heading 270]
         ]
-      [ifelse goalY > 0
-        [set heading 0]
-        [set heading 180]
+        [ifelse (otherGoalX > abs(goalX))
+          [set heading 270]
+          [set heading 90]
         ]
       ]
-    [ifelse abs(goalX) > abs(goalY)
-      [ifelse goalX > 0
-        [set heading 90]
-        [set heading 270]
-        ]
       [ifelse goalY > 0
-        [set heading 0]
-        [set heading 180]
+        [ifelse (otherGoalY > goalY)
+          [set heading 0]
+          [set heading 180]
         ]
+        [ifelse (otherGoalY > abs(goalY))
+          [set heading 180]
+          [set heading 0]
+        ]
+      ]
+    ]
+    [ifelse abs(compareX) > abs(compareY)
+      [ifelse goalX > 0
+        [ifelse (otherGoalX > goalX)
+          [set heading 90]
+          [set heading 270]
+        ]
+        [ifelse (otherGoalX > abs(goalX))
+          [set heading 270]
+          [set heading 90]
+        ]
+      ]
+      [ifelse goalY > 0
+        [ifelse (otherGoalY > goalY)
+          [set heading 0]
+          [set heading 180]
+        ]
+        [ifelse (otherGoalY > abs(goalY))
+          [set heading 180]
+          [set heading 0]
+        ]
+      ]
      ]
 end
 
@@ -69,29 +108,117 @@ end
 to seek-pos
   let goalX item 0 last-rh-pos - xcor
   let goalY item 1 last-rh-pos - ycor
-  let headingX -1
-  let headingY -1
+  let otherGoalX max-pxcor - abs(goalX)
+  let otherGoalY max-pycor - abs (goalY)
+  let compareX 0
+  let compareY 0
   
- ; print("seeking pos !! ")
- ; print (who)
+  ifelse (otherGoalX >= abs(goalX))
+  [set compareX goalX]
+  [set compareX otherGoalX]
   
-  if not (goalX = 0)
-  [ifelse goalX > 0
-   [set headingX 90]
-   [set headingX 270]
-  ]
-   
-  if not (goalY = 0)
-  [ifelse goalY > 0
-    [set headingY 0]
-    [set headingY 180]
-  ]
+  ifelse (otherGoalY >= abs(goalY))
+  [set compareY goalY]
+  [set compareY otherGoalY]
   
-  ifelse (((headingX = heading) or (headingY = heading)) and (free-floor-ahead?))
-  [move-ahead]
-  [turn-goal item 0 last-rh-pos item 1 last-rh-pos]
+  ifelse abs(compareX) = abs(compareY)
+    [let rand random 10
+      ifelse rand < 5
+      [ifelse goalX > 0
+        [ifelse (otherGoalX > goalX)
+          [ifelse(heading = 90)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 90]
+          ]
+          [ifelse(heading = 270)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 270]
+          ]
+        ]
+        [ifelse (otherGoalX > goalX)
+          [ifelse(heading = 270)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 270]
+          ]
+          [ifelse(heading = 90)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 90]
+          ]
+        ]
+      ]
+      [ifelse goalY > 0
+        [ifelse (otherGoalY > goalY)
+          [ifelse(heading = 0)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 0]
+          ]
+          [ifelse(heading = 180)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 180]
+          ]
+        ]
+        [ifelse (otherGoalY > goalY)
+          [ifelse(heading = 180)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 180]
+          ]
+          [ifelse(heading = 0)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 0]
+          ]
+        ]
+      ]
+    ]
+    [ifelse abs(compareX) > abs(compareY)
+      [ifelse goalX > 0
+        [ifelse (otherGoalX > goalX)
+          [ifelse(heading = 90)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 90]
+          ]
+          [ifelse(heading = 270)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 270]
+          ]
+        ]
+        [ifelse (otherGoalX > goalX)
+          [ifelse(heading = 270)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 270]
+          ]
+          [ifelse(heading = 90)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 90]
+          ]
+        ]
+      ]
+      [ifelse goalY > 0
+        [ifelse (otherGoalY > goalY)
+          [ifelse(heading = 0)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 0]
+          ]
+          [ifelse(heading = 180)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 180]
+          ]
+        ]
+        [ifelse (otherGoalY > goalY)
+          [ifelse(heading = 180)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 180]
+          ]
+          [ifelse(heading = 0)
+            [if (free-floor-ahead?) [move-ahead]]
+            [set heading 0]
+          ]
+        ]
+      ]
+     ]
+    
+     
+    if (xcor = item 0 last-rh-pos) and (ycor = item 1 last-rh-pos)
+    [set last-rh-pos []]
   
-  if (headingX = -1) and (headingY = -1)
-   [set last-rh-pos []]
   
 end

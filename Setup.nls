@@ -89,6 +89,7 @@ to setup-turtles
   ask turtle 1 [set ycor py]
   ask turtle 1 [set heading 90]
   ask turtle 1 [set last-rh-pos []]
+  ask turtle 1 [set shape "arrow"]
 
   ;; set wolf 2
   ask turtle 2 [set color green]
@@ -107,6 +108,7 @@ to setup-turtles
   ask turtle 2 [set ycor py]
   ask turtle 2 [set heading 90]
   ask turtle 2 [set last-rh-pos []]
+  ask turtle 2 [set shape "airplane"]
 
   ;; set wolf 3
   ask turtle 3 [set color black]
@@ -125,6 +127,7 @@ to setup-turtles
   ask turtle 3 [set ycor py]
   ask turtle 3 [set heading 90]
   ask turtle 3 [set last-rh-pos []]
+  ask turtle 3 [set shape "default"]
 
   ;; set wolf 4
 
@@ -143,6 +146,7 @@ to setup-turtles
   ask turtle 4 [set ycor py]
   ask turtle 4 [set heading 90]
   ask turtle 4 [set last-rh-pos []]
+  ask turtle 4 [set shape "turtle"]
 
 end
 
