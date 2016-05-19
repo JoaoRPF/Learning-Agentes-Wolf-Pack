@@ -17,7 +17,7 @@ to go
   ]
 
   if parou
-  [ifelse(episodes = 10)
+  [ifelse(episodes = 50)
     [
       set averageSteps (averageSteps / episodes)
       stop]
@@ -157,10 +157,10 @@ end
 GRAPHICS-WINDOW
 210
 10
-545
-366
-12
-12
+455
+210
+6
+6
 13.0
 1
 10
@@ -171,10 +171,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--12
-12
--12
-12
+-6
+6
+-6
+6
 0
 0
 1
@@ -241,7 +241,7 @@ MAX_VISION
 MAX_VISION
 1
 max-pxcor
-6
+4
 1
 1
 NIL
@@ -308,7 +308,7 @@ SWITCH
 306
 memory-last-pos
 memory-last-pos
-1
+0
 1
 -1000
 
@@ -655,7 +655,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.3
+NetLogo 5.2.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

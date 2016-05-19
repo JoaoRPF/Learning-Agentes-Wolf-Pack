@@ -39,8 +39,8 @@ end
 to turn-goal [x y]
   let goalX x - xcor
   let goalY y - ycor
-  let otherGoalX max-pxcor - abs(goalX)
-  let otherGoalY max-pycor - abs (goalY)
+  let otherGoalX (2 * max-pxcor + 1) - abs(goalX)
+  let otherGoalY (2 * max-pycor + 1) - abs (goalY)
   let compareX 0
   let compareY 0
   
@@ -108,8 +108,8 @@ end
 to seek-pos
   let goalX item 0 last-rh-pos - xcor
   let goalY item 1 last-rh-pos - ycor
-  let otherGoalX max-pxcor - abs(goalX)
-  let otherGoalY max-pycor - abs (goalY)
+  let otherGoalX (2 * max-pxcor + 1) - abs(goalX)
+  let otherGoalY (2 * max-pycor + 1) - abs (goalY)
   let compareX 0
   let compareY 0
   
@@ -216,9 +216,15 @@ to seek-pos
       ]
      ]
     
+    ;print "Who am i"
+    ;print who
+    ;print "My x"
+    ;print item 0 last-rh-pos
+    ;print "My y"
+    ;print item 1 last-rh-pos
      
     if (xcor = item 0 last-rh-pos) and (ycor = item 1 last-rh-pos)
-    [set last-rh-pos []]
+       [set last-rh-pos []]
   
   
 end
