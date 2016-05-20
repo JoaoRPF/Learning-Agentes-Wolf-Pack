@@ -6,32 +6,53 @@ to deliberative-wolf-loop
   
   if (not empty? last-rh-pos) and (xcor = item 0 last-rh-pos ) and (ycor = item 1 last-rh-pos)
      [set last-rh-pos []]
-  ifelse redHood-in-sight-90? and free-floor-ahead?
-    [ if (memory-last-pos) [set last-rh-pos list [xcor] of turtle 0 [ycor] of turtle 0]
-      move-ahead]
-    [ifelse redHood-in-sight-360?
-      [turn-goal [xcor] of turtle 0 [ycor] of turtle 0]
-      [ifelse (not empty? last-rh-pos)
-        [seek-pos]
-        [ifelse ((rand <= 5) and free-floor-ahead?)
-          [move-ahead]
-          [ifelse rand <= 7.5 
-            [rotate-right]
-            [rotate-left]
+  
+  ifelse wolf-adjacent-to-redHood?
+    [ set have-goal? 0
+      ifelse was-adjacent-to-redHood
+        [do-nothing]
+        [set-adjacent-position-occupied]
+    ]
+    [ mark-as-not-adjacent
+      ifelse redHood-in-sight-90?
+        [ifelse free-floor-ahead?
+          [ set have-goal? 0
+            move-ahead]
+          [ ifelse (have-goal? = 1)
+              [continue-seeking]
+              [set have-goal? 1
+               choose-best-alternative]
+          ]
+         ]
+        [ifelse redHood-in-sight-360?
+          [ifelse free-floor-ahead?
+            [ ifelse (have-goal? = 1)
+              [continue-seeking]
+              [turn-goal [xcor] of turtle 0 [ycor] of turtle 0]
+            ]
+            [ set have-goal? 1
+              choose-best-alternative]
+          ]
+          [ set have-goal? 0
+            ifelse (not empty? last-rh-pos)
+            [seek-pos]
+            [ifelse ((rand <= 5) and free-floor-ahead?)
+              [move-ahead]
+              [ifelse rand <= 7.5
+                [rotate-left]
+                [rotate-right]
+              ]
+            ]
           ]
         ]
-      ]
-    ]
-    
+     ]
+      
   ifelse redHood-in-sight-360?
     [set color orange]
     [ifelse (not empty? last-rh-pos)
     [set color green]
     [set color blue]]
-      
 end
-
-
 
 ;;;
 ;;;  Turn robot to goal
@@ -57,48 +78,12 @@ to turn-goal [x y]
   ifelse abs(compareX) = abs(compareY)
     [let rand random 10
       ifelse rand < 5
-      [ifelse goalX > 0
-        [ifelse (otherGoalX > goalX)
-          [set heading 90]
-          [set heading 270]
-        ]
-        [ifelse (otherGoalX > abs(goalX))
-          [set heading 270]
-          [set heading 90]
-        ]
-      ]
-      [ifelse goalY > 0
-        [ifelse (otherGoalY > goalY)
-          [set heading 0]
-          [set heading 180]
-        ]
-        [ifelse (otherGoalY > abs(goalY))
-          [set heading 180]
-          [set heading 0]
-        ]
-      ]
-    ]
+        [facexy [xcor] of turtle 0 ycor]
+        [facexy xcor [ycor] of turtle 0]
+    ] 
     [ifelse abs(compareX) > abs(compareY)
-      [ifelse goalX > 0
-        [ifelse (otherGoalX > goalX)
-          [set heading 90]
-          [set heading 270]
-        ]
-        [ifelse (otherGoalX > abs(goalX))
-          [set heading 270]
-          [set heading 90]
-        ]
-      ]
-      [ifelse goalY > 0
-        [ifelse (otherGoalY > goalY)
-          [set heading 0]
-          [set heading 180]
-        ]
-        [ifelse (otherGoalY > abs(goalY))
-          [set heading 180]
-          [set heading 0]
-        ]
-      ]
+      [facexy [xcor] of turtle 0 ycor]
+      [facexy xcor [ycor] of turtle 0]
      ]
 end
 

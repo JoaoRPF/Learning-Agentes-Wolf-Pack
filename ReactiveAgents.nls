@@ -71,7 +71,7 @@ to-report wolf-ahead?
 end
 
 ;;;
-;;;check redHood ahead
+;;;check redHood in sight 90º
 ;;;
 to-report redHood-in-sight-90?
   let goal redHoods in-cone MAX_VISION 90
@@ -93,7 +93,24 @@ to-report redHood-in-sight-360?
   let goal redHoods in-cone MAX_VISION 360
   report(any? goal)
 end
- 
+
+;;;
+;;;check if wolf is adjacent to redhood
+;;;
+to-report wolf-adjacent-to-redHood?
+  let goal neighbors4
+  report (any? redHoods-on goal)
+end
+
+;;;
+;;; check if wolf was adjacent to redhood
+;;;
+to-report was-adjacent-to-redHood
+  ifelse (my-last-adjacent > 0)
+    [report true]
+    [report false]
+end
+
 
 ;;;
 ;;; ------------------------
@@ -129,7 +146,142 @@ to rotate-backwards
   lt 180
 end
 
+;;;
+;;; mark adjacent redhood position as occupied
+;;;
+to set-adjacent-position-occupied
+  let redhood-x [xcor] of turtle 0
+  let redhood-y [ycor] of turtle 0
+  
+  let dif-x redhood-x - xcor
+  let dif-y redhood-y - ycor
+  
+  ifelse (dif-x < 0)
+    [ask turtle 0 [set east 1] ;;; this is just a boolean (1 if true, 0 if false)
+     set my-last-adjacent 3 ;;; east is value 3 
+    ]
+    [ifelse (dif-x < 0)
+      [ask turtle 0 [set west 1]
+       set my-last-adjacent 4
+      ]
+      [ifelse (dif-y < 0)
+        [ask turtle 0 [set north 1]
+         set my-last-adjacent 1
+        ]
+        [ask turtle 0 [set south 1]
+         set my-last-adjacent 2
+        ]
+      ]
+    ]
+end
 
 ;;;
-;;;  Turn robot to goal
+;;; mark past adjacent position as null (0)
 ;;;
+to mark-as-not-adjacent
+  ifelse (my-last-adjacent = 1)
+    [ask turtle 0 [set north 0]]
+    [ifelse (my-last-adjacent = 2)
+      [ask turtle 0 [set south 0]]
+      [ifelse (my-last-adjacent = 3)
+        [ask turtle 0 [set east 0]]
+        [if (my-last-adjacent = 4) 
+          [ask turtle 0 [set west 0]]
+       ]
+      ]
+    ] 
+  set my-last-adjacent 0
+end
+
+;;;
+;;; do nothing
+;;;
+to do-nothing
+end
+
+;;;
+;;; continue seeking when a wolf has a temporary goal
+;;;
+to continue-seeking
+
+  let north-x xcor
+  let north-y xcor + 1
+  let south-x xcor
+  let south-y ycor - 1
+  let east-x xcor + 1
+  let east-y ycor
+  let west-x xcor - 1
+  let west-y ycor
+  set last-rh-pos []  
+  ;let north-neighbor wolfs at-points [[north-x north-y]]
+  ;let south-neighbor wolfs at-points [[south-x south-y]]
+  ;let east-neighbor wolfs at-points [[east-x east-y]]
+  ;let west-neighbor wolfs at-points [[west-x west-y]]
+  let rand-index random 4
+  let rand 0
+  if (rand-index = 0) [set rand 0]
+  if (rand-index = 1) [set rand 90]
+  if (rand-index = 2) [set rand 180]
+  if (rand-index = 3) [set rand 270]
+  
+  ifelse free-floor-ahead?
+    [move-ahead]
+    [set heading rand] 
+end
+
+
+
+;;;
+;;; wolf is seeing redhood but cannot move forward. has to find another position
+;;;
+
+to choose-best-alternative
+  let redHood-x [xcor] of turtle 0
+  let redHood-y [ycor] of turtle 0
+  
+  let north-rh [north] of turtle 0
+  let south-rh [south] of turtle 0
+  let east-rh [east] of turtle 0
+  let west-rh [west] of turtle 0
+  
+  ifelse (north-rh = 0)
+    [avoid-other-wolfs 1
+     set goal-x redHood-x
+     set goal-y redHood-y + 1]
+    [ifelse (east-rh = 0)
+      [avoid-other-wolfs 3
+      set goal-x redHood-x + 1
+      set goal-y redHood-y]
+      [ifelse (west-rh = 0)
+        [avoid-other-wolfs 4
+          set goal-x redHood-x - 1
+          set goal-y redHood-y]
+        [if (south-rh = 0)
+          [avoid-other-wolfs 2
+            set goal-x redHood-x
+            set goal-y redHood-y - 1]
+        ]
+      ]
+    ]
+end
+
+
+;;;
+;;; avoid other-wolfs when close to redhood
+;;;
+to avoid-other-wolfs [direction]
+  let goalX xcor
+  let goalY ycor
+  
+  ifelse (direction = 1)
+    [set goalY goalY + 1]
+    [ifelse (direction = 2)
+      [set goalY goalY - 1]
+      [ifelse (direction = 3)
+        [set goalX goalX + 1]
+        [set goalX goalX - 1]
+      ]
+    ]
+    
+  facexy goalX goalY
+end

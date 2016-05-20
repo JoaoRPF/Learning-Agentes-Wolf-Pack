@@ -17,7 +17,7 @@ to go
   ]
 
   if parou
-  [ifelse(episodes = 50)
+  [ifelse(episodes = 25)
     [
       set averageSteps (averageSteps / episodes)
       stop]
@@ -54,114 +54,23 @@ to redHood-loop
    [ stop ]
 
   let rand random 10
-  ifelse (rand <= 8) and (free-floor-ahead? )
+  ifelse (rand < Red-Hood-Move) and (free-floor-ahead? )
     [move-ahead]
-    [ifelse rand <= 9
+    [ set rand random 10
+      ifelse rand <= 5
       [rotate-left]
       [rotate-right]
     ]
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-;;
-;;  DEPRECATED
-;;
-to wolf-loop2
-
-  ifelse redHood-in-sight-90?
-  [
-
-
-    let goalX [xcor] of turtle 0 - xcor
-    let goalY [ycor] of turtle 0 - ycor
-
-    ifelse abs(goalX) = abs(goalY)
-    [let rand random 10
-      ifelse rand < 5
-      [ifelse goalX > 0
-        [setxy (xcor + 1) ycor]
-        [setxy (xcor - 1) ycor]
-        ]
-      [ifelse goalY > 0
-        [setxy xcor (ycor + 1)]
-        [setxy xcor (ycor - 1)]
-        ]
-      ]
-    [ifelse abs(goalX) > abs(goalY)
-      [ifelse goalX > 0
-        [setxy (xcor + 1) ycor]
-        [setxy (xcor - 1) ycor]
-        ]
-      [ifelse goalY > 0
-        [setxy xcor (ycor + 1)]
-        [setxy xcor (ycor - 1)]
-        ]
-     ]
-   ]
-  [
-    let rand random 10
-    ifelse (rand <= 8)
-    [move-ahead]
-    [rotate-right]
-   ]
-end
-
-to setup-patches2
-  ;; Build the floor
-  ask patches [
-    set kind ROOM_FLOOR
-    set pcolor gray + 4 ]
-
-
-  let wall1 n-values (MAPBOUNDS + 1) [0 - ?]
-  let wall2 n-values MAPBOUNDS [1 + ?]
-
-  foreach wall1
-    [ ask patch ? (0 - MAPBOUNDS) [set pcolor black]
-      ask patch ? (0 - MAPBOUNDS) [set kind WALL]
-      ask patch ? MAPBOUNDS [set pcolor black]
-      ask patch ? MAPBOUNDS [set kind WALL]
-      ask patch (0 - MAPBOUNDS) ? [set pcolor black]
-      ask patch (0 - MAPBOUNDS) ? [set kind WALL]
-      ask patch MAPBOUNDS ? [set pcolor black]
-      ask patch MAPBOUNDS ? [set kind WALL]]
-
-  foreach wall2
-    [ ask patch ? (0 - MAPBOUNDS) [set pcolor black]
-      ask patch ? (0 - MAPBOUNDS) [set kind WALL]
-      ask patch ? MAPBOUNDS [set pcolor black]
-      ask patch ? MAPBOUNDS [set kind WALL]
-      ask patch (0 - MAPBOUNDS) ? [set pcolor black]
-      ask patch (0 - MAPBOUNDS) ? [set kind WALL]
-      ask patch MAPBOUNDS ? [set pcolor black]
-      ask patch MAPBOUNDS ? [set kind WALL]]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
 10
 455
-210
+236
 6
 6
-13.0
+15.0
 1
 10
 1
@@ -241,17 +150,17 @@ MAX_VISION
 MAX_VISION
 1
 max-pxcor
-4
+3
 1
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-21
-217
-159
-262
+17
+324
+155
+369
 Agent-Mode
 Agent-Mode
 "Reactive" "Deliberative" "Learning"
@@ -302,15 +211,30 @@ averageSteps
 12
 
 SWITCH
-22
-273
-170
-306
+18
+393
+166
+426
 memory-last-pos
 memory-last-pos
 0
 1
 -1000
+
+SLIDER
+15
+255
+187
+288
+Red-Hood-Move
+Red-Hood-Move
+0
+10
+2
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

@@ -17,7 +17,10 @@ patches-own [kind]
 ;;;
 ;;;  Declare turtles' properties
 ;;;
-wolfs-own [last-rh-pos]
+;;; my-last-adjacent is a number 1(north), 2(south), 3(east) and 4(west) that informs if i'm close to a redhood and where. If 0 i'm not close
+;;;
+wolfs-own [last-rh-pos my-last-adjacent have-goal? goal-x goal-y] 
+redHoods-own [north south east west]
 
 ;;;
 ;;;  Reset the simulation
@@ -67,6 +70,10 @@ to setup-turtles
   ask turtle 0 [set xcor 0]
   ask turtle 0 [set ycor 0]
   ask turtle 0 [set heading 90]
+  ask turtle 0 [set north 0]
+  ask turtle 0 [set south 0]
+  ask turtle 0 [set west 0]
+  ask turtle 0 [set east 0]
 
   set-default-shape wolfs "default"
 
@@ -90,6 +97,10 @@ to setup-turtles
   ask turtle 1 [set heading 90]
   ask turtle 1 [set last-rh-pos []]
   ask turtle 1 [set shape "arrow"]
+  ask turtle 1 [set my-last-adjacent 0]
+  ask turtle 1 [set have-goal? 0]
+  ask turtle 1 [set goal-x 0]
+  ask turtle 1 [set goal-y 0]
 
   ;; set wolf 2
   ask turtle 2 [set color green]
@@ -109,6 +120,10 @@ to setup-turtles
   ask turtle 2 [set heading 90]
   ask turtle 2 [set last-rh-pos []]
   ask turtle 2 [set shape "airplane"]
+  ask turtle 2 [set my-last-adjacent 0]
+  ask turtle 2 [set have-goal? 0]
+  ask turtle 2 [set goal-x 0]
+  ask turtle 2 [set goal-y 0]
 
   ;; set wolf 3
   ask turtle 3 [set color black]
@@ -128,6 +143,10 @@ to setup-turtles
   ask turtle 3 [set heading 90]
   ask turtle 3 [set last-rh-pos []]
   ask turtle 3 [set shape "default"]
+  ask turtle 3 [set my-last-adjacent 0]
+  ask turtle 3 [set have-goal? 0]
+  ask turtle 3 [set goal-x 0]
+  ask turtle 3 [set goal-y 0]
 
   ;; set wolf 4
 
@@ -147,6 +166,10 @@ to setup-turtles
   ask turtle 4 [set heading 90]
   ask turtle 4 [set last-rh-pos []]
   ask turtle 4 [set shape "turtle"]
+  ask turtle 4 [set my-last-adjacent 0]
+  ask turtle 4 [set have-goal? 0]
+  ask turtle 4 [set goal-x 0]
+  ask turtle 4 [set goal-y 0]
 
 end
 
