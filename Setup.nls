@@ -12,14 +12,14 @@ breed [ redHoods redHood ]
 ;;;
 ;;;  Declare cells' properties
 ;;;
-patches-own [kind]
+patches-own [kind has-wolf parent-patch f g h ]
 
 ;;;
 ;;;  Declare turtles' properties
 ;;;
 ;;; my-last-adjacent is a number 1(north), 2(south), 3(east) and 4(west) that informs if i'm close to a redhood and where. If 0 i'm not close
 ;;;
-wolfs-own [last-rh-pos my-last-adjacent have-goal? goal-x goal-y] 
+wolfs-own [last-rh-pos my-last-adjacent have-goal? goal-x goal-y best-path open closed] 
 redHoods-own [north south east west]
 
 ;;;

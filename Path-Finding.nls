@@ -1,0 +1,81 @@
+;;;
+;;; Just retrieve the best path to our variable
+;;;
+to find-shortest-path [actual-turtle]
+  set best-path find-path actual-turtle
+end
+
+;;;
+;;; Find a path from our position to an adjacent redhood position
+;;;
+to-report find-path [actual-turtle]
+  let auxNeighbor 0
+  let me turtle actual-turtle            ;;; gets the actual turtle
+  let search-completed? false            ;;; indicates that the search is not over
+  let search-path []                     ;;; actual path
+  let current-patch 0                    ;;; current patch where the search is in
+  let source-patch patch-here            ;;; source is where turtle is in the beggining
+  let goal-patch [patch-here] of turtle 0  ;;; redHood patch
+  set open []                            ;;; open nodes list for a turtle
+  set closed []                          ;;; closed nodes list for a turtle
+  
+  set open lput patch-here open   ;;; puts the under-turtle patch on open list
+  
+  ;;; loop until reach goal or open list is empty
+  while [search-completed? = false]
+  
+    [ifelse length open > 0
+      [set open sort-by [[f] of ?1 < [f] of ?2] open   ;;; sort open list in increasing values of f
+       set current-patch item 0 open                   ;;; current patch as the most promising (higher f)
+       set open remove-item 0 open
+       set closed lput current-patch closed            ;;; add current patch to closed list
+       
+       ;;; explore the north, south, east and west neighbors
+
+       ask current-patch
+       [ ifelse any? redHoods-on neighbors4                                  ;;; if we already are next to redhood, stop
+         [set search-completed? true]
+         [ask neighbors4 with [(has-wolf = 0) and (not member? self [closed] of me) and (self != parent-patch)]     ;;; neighbors cannot be other wolfs or explored patches
+           [ if not member? self [open] of me and self != source-patch and self != goal-patch                       ;;; neighbors cannot be the source or the goal, or being in open list
+             [ set auxNeighbor self
+               ask me 
+               [set open lput auxNeighbor open]                                                                ;;; neighbor is added to open list
+               ;;; update variables of path finding
+               set parent-patch current-patch
+               set g [g] of parent-patch + 1
+               set h distance goal-patch
+               set f (g + h)
+             ]
+           ]
+         ]
+       ]
+      ]
+      [ ;;; path not found
+        print ("Didn't find a path")
+        report []
+      ]
+    ]
+  ;;; if path found, add current patch to it
+  set search-path lput current-patch search-path
+  
+  ;;; trace search patch, using the parent of all patches
+  let node first search-path
+  while [node != source-patch]
+  [set search-path lput ([parent-patch] of node) search-path
+   set node [parent-patch] of node
+  ]
+  
+  ;;; reverse path to start in adjacent patch to start, and end in goal-patch
+  set search-path reverse search-path
+  
+  report search-path
+end
+  
+;;;
+;;; Move or rotate for the best position possible, having the a* path
+;;;
+to do-action
+  ifelse (patch-ahead 1 = item 1 best-path)
+    [move-ahead]
+    [face item 1 best-path]
+end

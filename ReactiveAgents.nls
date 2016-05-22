@@ -122,7 +122,9 @@ end
 ;;;  Move the robot forward
 ;;;
 to move-ahead
+  ask patch-here [set has-wolf 0]
   fd 1
+  ask patch-here [set has-wolf 1]
 end
 
 ;;;

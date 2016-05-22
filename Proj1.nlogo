@@ -1,6 +1,7 @@
 __includes["Setup.nls"
            "ReactiveAgents.nls"
-           "DeliberativeAgents.nls"]
+           "DeliberativeAgents.nls"
+           "Path-Finding.nls"]
 
 
 ;;;
@@ -150,7 +151,7 @@ MAX_VISION
 MAX_VISION
 1
 max-pxcor
-3
+2
 1
 1
 NIL
@@ -217,7 +218,7 @@ SWITCH
 426
 memory-last-pos
 memory-last-pos
-0
+1
 1
 -1000
 
@@ -230,7 +231,7 @@ Red-Hood-Move
 Red-Hood-Move
 0
 10
-2
+3
 1
 1
 NIL

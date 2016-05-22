@@ -14,27 +14,10 @@ to deliberative-wolf-loop
         [set-adjacent-position-occupied]
     ]
     [ mark-as-not-adjacent
-      ifelse redHood-in-sight-90?
-        [ifelse free-floor-ahead?
-          [ set have-goal? 0
-            move-ahead]
-          [ ifelse (have-goal? = 1)
-              [continue-seeking]
-              [set have-goal? 1
-               choose-best-alternative]
-          ]
-         ]
-        [ifelse redHood-in-sight-360?
-          [ifelse free-floor-ahead?
-            [ ifelse (have-goal? = 1)
-              [continue-seeking]
-              [turn-goal [xcor] of turtle 0 [ycor] of turtle 0]
-            ]
-            [ set have-goal? 1
-              choose-best-alternative]
-          ]
-          [ set have-goal? 0
-            ifelse (not empty? last-rh-pos)
+      ifelse redHood-in-sight-360?
+        [find-shortest-path who
+         do-action]
+         [ifelse (not empty? last-rh-pos)
             [seek-pos]
             [ifelse ((rand <= 5) and free-floor-ahead?)
               [move-ahead]
@@ -43,9 +26,8 @@ to deliberative-wolf-loop
                 [rotate-right]
               ]
             ]
-          ]
-        ]
-     ]
+         ]
+    ]
       
   ifelse redHood-in-sight-360?
     [set color orange]
@@ -200,16 +182,11 @@ to seek-pos
         ]
       ]
      ]
-    
-    ;print "Who am i"
-    ;print who
-    ;print "My x"
-    ;print item 0 last-rh-pos
-    ;print "My y"
-    ;print item 1 last-rh-pos
      
     if (xcor = item 0 last-rh-pos) and (ycor = item 1 last-rh-pos)
        [set last-rh-pos []]
-  
-  
 end
+
+
+
+
