@@ -1,0 +1,223 @@
+;;;
+;;;  Use the "array" extension for easy and efficient Q-value storage
+;;;
+extensions [array]
+
+
+;;;
+;;;  Robot's updating procedure, which defines the rules of its behaviors
+;;;
+to-report learning-wolf-loop
+
+  let limit 2 * MAX_VISION + 1
+
+  let xW limit
+  let yW limit
+  
+  let xW2 limit
+  let yW2 limit
+  
+  let xW3 limit
+  let yW3 limit
+  
+  let xR limit
+  let yR limit
+  
+  if (redHood-in-sight-360?)
+  [ set xR xcor - [xcor] of turtle 0 + MAX_VISION
+    set yR ycor - [ycor] of turtle 0 + MAX_VISION
+    if (xR < 0) [set xR (2 * max-pxcor + 1) + xR]
+    if (xR > limit) [set xR xR - (2 * max-pxcor + 1)]
+    if (yR < 0) [set yR (2 * max-pycor + 1) + yR]
+    if (yR > limit) [set yR yR - (2 * max-pycor + 1)]
+    ]
+  
+  if (wolf-in-sight-360? item 0 pack-members) 
+  [ let wolf item 0 pack-members
+    set xW xcor - [xcor] of (turtle wolf) + MAX_VISION
+    set yW ycor - [ycor] of (turtle wolf) + MAX_VISION
+    if (xW < 0) [set xW (2 * max-pxcor + 1) + xW]
+    if (xW > limit) [set xW xW - (2 * max-pxcor + 1)]
+    if (yW < 0) [set yW (2 * max-pycor + 1) + yW]
+    if (yW > limit) [set yW yW - (2 * max-pycor + 1)]
+  ]
+  
+  if (wolf-in-sight-360? item 1 pack-members) 
+  [ let wolf item 1 pack-members
+    set xW2 xcor - [xcor] of (turtle wolf) + MAX_VISION
+    set yW2 ycor - [ycor] of (turtle wolf) + MAX_VISION
+    if (xW2 < 0) [set xW2 (2 * max-pxcor + 1) + xW2]
+    if (xW2 > limit) [set xW2 xW2 - (2 * max-pxcor + 1)]
+    if (yW2 < 0) [set yW2 (2 * max-pycor + 1) + yW2]
+    if (yW2 > limit) [set yW2 yW2 - (2 * max-pycor + 1)]
+  ]
+  
+  if (wolf-in-sight-360? item 2 pack-members) 
+  [ let wolf item 2 pack-members
+    set xW3 xcor - [xcor] of (turtle wolf) + MAX_VISION
+    set yW3 ycor - [ycor] of (turtle wolf) + MAX_VISION
+    if (xW3 < 0) [set xW3 (2 * max-pxcor + 1) + xW3]
+    if (xW3 > limit) [set xW3 xW3 - (2 * max-pxcor + 1)]
+    if (yW3 < 0) [set yW3 (2 * max-pycor + 1) + yW3]
+    if (yW3 > limit) [set yW3 yW3 - (2 * max-pycor + 1)]
+  ]
+  ;if (wolf-in-sight-360? item 2 pack-members) 
+  ;[ let wolf item 2 pack-members
+  ;  set xW3 xcor - [xcor] of (turtle wolf) + MAX_VISION
+  ;  set yW3 ycor - [ycor] of (turtle wolf) + MAX_VISION
+  ;]
+  
+
+  ; chooses action
+  let action-patch select-action xW yW xR yR xW2 yW2 xW3 yW3
+  
+  ; updates environmet
+  ;execute-action action
+
+  ; gets reward
+  ;set reward get-reward action
+  ;set total-reward (total-reward + reward)
+
+  ; updates Q-value function
+  ;update-Q-value action
+
+  ifelse redHood-in-sight-360?
+     [set color orange]
+     [set color blue]
+     
+  report action-patch
+   
+end
+
+
+;;;  =================================================================
+;;;      Utils
+;;;  =================================================================
+
+to-report get-action-index [ action ]
+  report position action ACTION-LIST
+end
+
+;;;
+;;;  Creates the initial Q-value function structure: (xW yW xR yR action) <- 0.
+;;;
+to-report get-initial-Q-values
+  report array:from-list n-values (2 * MAX_VISION + 2) [
+    array:from-list n-values (2 * MAX_VISION + 2)[
+      array:from-list n-values (2 * MAX_VISION + 2)[
+        array:from-list n-values(2 * MAX_VISION + 2)[
+      array:from-list n-values NUM-ACTIONS [0]]]]]
+end
+
+;;;
+;;;  Gets the Q-values for a specific state (x y).
+;;;
+to-report get-Q-values [xW yW xR yR queu]
+  ifelse (queu = 1)
+  [report array:item (array:item (array:item (array:item Q-values1 xW) yW) xR) yR]
+  [ifelse (queu = 2)
+    [report array:item (array:item (array:item (array:item Q-values2 xW) yW) xR) yR]
+    [report array:item (array:item (array:item (array:item Q-values3 xW) yW) xR) yR]
+  ]
+end
+
+;;;
+;;;  Gets the Q-value for a specific state-action pair (x y action).
+;;;
+to-report get-Q-value [xW yW xR yR action queu]
+  let action-values get-Q-values xW yW xR yR queu
+  report array:item action-values (get-action-index action)
+end
+
+;;;
+;;;  Sets the Q-value for a specific state-action pair (x y action).
+;;;
+to set-Q-value [xW yW xR yR action value queu]
+  array:set (get-Q-values xW yW xR yR queu) (get-action-index action) value
+end
+
+;;;
+;;;  Gets the maximum Q-value for a specific state (x y).
+;;;
+to-report get-max-Q-value [xW yW xR yR queu]
+    report max array:to-list get-Q-values xW yW xR yR queu
+end
+
+;;;
+;;;  Gets the reward related with the current state and a given action (x y action).
+;;;
+to-report get-reward [action]
+  ask turtle 0[
+  ifelse (is-surrounded)
+  [report 1]
+  [ifelse (ticks >= 1500)
+    [print "1500 ticks !!!!"
+      report -0.1]
+    [report 0]
+    ]
+  ]
+end
+
+
+;;;  =================================================================
+;;;      Learning
+;;;  =================================================================
+
+
+;;;
+;;;  Updates the Q-value for a given action according to the Q-learning algorithm update rule.
+;;;
+to update-Q-learning1 [action]
+  
+  let previous-Q-value (get-Q-value pre-x-W1 pre-y-W1 pre-x-R pre-y-R action 1)
+  
+  let prediction-error (reward + (discount-factor * get-max-Q-value (xcor - [xcor] of (item 0 pack-members)) (ycor - [ycor] of (item 0 pack-members)) (xcor - [xcor] of turtle 0) (ycor - [ycor] of turtle 0) 1 ) - previous-Q-value)
+  
+  let new-Q-value (previous-Q-value + (learning-rate * prediction-error))
+
+  set-Q-value pre-x-W1 pre-y-W1 pre-x-R pre-y-R action new-Q-value 1
+end
+
+to update-Q-learning2 [action]
+  
+  let previous-Q-value (get-Q-value pre-x-W2 pre-y-W2 pre-x-R pre-y-R action 2)
+  
+  let prediction-error (reward + (discount-factor * get-max-Q-value (xcor - [xcor] of (item 1 pack-members)) (ycor - [ycor] of (item 1 pack-members)) (xcor - [xcor] of turtle 0) (ycor - [ycor] of turtle 0) 2 ) - previous-Q-value)
+  
+  let new-Q-value (previous-Q-value + (learning-rate * prediction-error))
+
+  set-Q-value pre-x-W1 pre-y-W1 pre-x-R pre-y-R action new-Q-value 1
+end
+
+to update-Q-learning3 [action]
+  
+  let previous-Q-value (get-Q-value pre-x-W3 pre-y-W3 pre-x-R pre-y-R action 3)
+  
+  let prediction-error (reward + (discount-factor * get-max-Q-value (xcor - [xcor] of (item 2 pack-members)) (ycor - [ycor] of (item 2 pack-members)) (xcor - [xcor] of turtle 0) (ycor - [ycor] of turtle 0) 3 ) - previous-Q-value)
+  
+  let new-Q-value (previous-Q-value + (learning-rate * prediction-error))
+
+  set-Q-value pre-x-W3 pre-y-W3 pre-x-R pre-y-R action new-Q-value 3
+end
+
+;;;
+;;;  Chooses an action according to the soft-max method.
+;;;
+to-report select-action [xW yW xR yR xW2 yW2 xW3 yW3]
+
+  let action-values1 array:to-list (get-Q-values xW yW xR yR 1)
+  let action-values2 array:to-list (get-Q-values xW2 yW2 xR yR 2)
+  let action-values3 array:to-list (get-Q-values xW3 yW3 xR yR 3)
+  
+  let totals [0 0 0 0 0]
+  let i 0
+  
+  foreach totals [
+    set totals replace-item i totals ( (item i action-values1) + (item i action-values2) + (item i action-values3) )
+    set i (i + 1)
+    ]
+
+  let action item (position (max totals) totals) ACTION-LIST
+  
+  report patch (xcor + item 0 action) (ycor + item 1 action)
+end

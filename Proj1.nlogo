@@ -1,7 +1,8 @@
 __includes["Setup.nls"
            "ReactiveAgents.nls"
            "DeliberativeAgents.nls"
-           "Path-Finding.nls"]
+           "Path-Finding.nls"
+           "LearningAgents.nls"]
 
 
 ;;;
@@ -17,6 +18,10 @@ to go
     redHood-loop
   ]
 
+  if Agent-Mode = "Learning" and ticks >= 1501
+  [set parou true]
+
+
   if parou
   [ifelse(episodes = 25)
     [
@@ -30,12 +35,46 @@ to go
     ]
   ]
 
+  let decisions [0 0 0 0]
+
   ask wolfs [
     if Agent-Mode = "Reactive"
-      [reactive-wolf-loop]
+      [set decisions replace-item (who - 1) decisions reactive-wolf-loop]
     if Agent-Mode = "Deliberative"
-    [deliberative-wolf-loop]
+      [set decisions replace-item (who - 1) decisions deliberative-wolf-loop]
+    if Agent-Mode = "Learning"
+      [set decisions replace-item (who - 1) decisions learning-wolf-loop]
   ]
+
+  let j 0
+  let i 0
+  foreach decisions
+  [foreach decisions
+    [if ( j != i)
+      [if (item j decisions) = (item i decisions)
+        [ if(item j decisions != 0) [set collisions (collisions + 1)]
+          set decisions replace-item i decisions 0
+          set decisions replace-item j decisions 0]]
+    set j (j + 1)]
+  set j 0
+  set i (i + 1)]
+
+  ifelse (Agent-Mode = "Learning")
+
+  [ask wolfs
+    [if (item (who - 1) decisions != 0)
+      [move-to item (who - 1 ) decisions]
+    ]
+  ]
+
+  [ask wolfs
+    [if (item (who - 1) decisions != 0)
+      [if (patch-ahead 1 = item (who - 1) decisions)
+        [if (free-floor-ahead?) [move-ahead
+          set in-same-pos 0]]]
+    ]
+  ]
+
 end
 
 to-report is-surrounded
@@ -151,7 +190,7 @@ MAX_VISION
 MAX_VISION
 1
 max-pxcor
-2
+3
 1
 1
 NIL
@@ -165,7 +204,7 @@ CHOOSER
 Agent-Mode
 Agent-Mode
 "Reactive" "Deliberative" "Learning"
-1
+2
 
 SLIDER
 12
@@ -231,8 +270,67 @@ Red-Hood-Move
 Red-Hood-Move
 0
 10
-3
+4
 1
+1
+NIL
+HORIZONTAL
+
+PLOT
+966
+156
+1166
+306
+Number of Collisions
+Episode
+Collisions
+0.0
+51.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"collisions" 1.0 1 -2139308 true "" "plotxy (episodes) (collisions)"
+
+MONITOR
+966
+94
+1061
+143
+NIL
+totalCollisions
+0
+1
+12
+
+SLIDER
+265
+372
+437
+405
+discount-factor
+discount-factor
+0
+1
+0.99
+0.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+267
+325
+439
+358
+learning-rate
+learning-rate
+0
+1
+0.1
+0.1
 1
 NIL
 HORIZONTAL
@@ -580,7 +678,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2.1
+NetLogo 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

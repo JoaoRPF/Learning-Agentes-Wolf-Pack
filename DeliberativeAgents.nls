@@ -1,8 +1,9 @@
 ;;;
 ;;;  Robot's updating procedure, which defines the rules of its behaviors
 ;;;
-to deliberative-wolf-loop
+to-report deliberative-wolf-loop
   let rand random 10
+  let d 0
   
   if (not empty? last-rh-pos) and (xcor = item 0 last-rh-pos ) and (ycor = item 1 last-rh-pos)
      [set last-rh-pos []]
@@ -10,23 +11,31 @@ to deliberative-wolf-loop
   ifelse wolf-adjacent-to-redHood?
     [ set have-goal? 0
       ifelse was-adjacent-to-redHood
-        [do-nothing]
+        [set d 0]
         [set-adjacent-position-occupied]
     ]
     [ mark-as-not-adjacent
-      ifelse redHood-in-sight-360?
+      ifelse (in-same-pos >= 5)
+      [ifelse ((rand <= 5) and free-floor-ahead?)
+              [set d patch-ahead 1]
+              [ifelse rand <= 7.5
+                [rotate-left]
+                [rotate-right]
+              ]]
+      [ifelse redHood-in-sight-360?
         [find-shortest-path who
-         do-action]
+         set d item 1 best-path]
          [ifelse (not empty? last-rh-pos)
-            [seek-pos]
+            [set d seek-pos]
             [ifelse ((rand <= 5) and free-floor-ahead?)
-              [move-ahead]
+              [set d patch-ahead 1]
               [ifelse rand <= 7.5
                 [rotate-left]
                 [rotate-right]
               ]
             ]
          ]
+      ]
     ]
       
   ifelse redHood-in-sight-360?
@@ -34,6 +43,13 @@ to deliberative-wolf-loop
     [ifelse (not empty? last-rh-pos)
     [set color green]
     [set color blue]]
+    
+    set in-same-pos (in-same-pos + 1)
+    
+    ifelse(patch-ahead 1 = d)
+    [report d]
+    [ if (d != 0) [face d]
+      report 0]
 end
 
 ;;;
@@ -72,13 +88,15 @@ end
 ;;;
 ;;;  seek last known position for redHood
 ;;;
-to seek-pos
+to-report seek-pos
   let goalX item 0 last-rh-pos - xcor
   let goalY item 1 last-rh-pos - ycor
   let otherGoalX (2 * max-pxcor + 1) - abs(goalX)
   let otherGoalY (2 * max-pycor + 1) - abs (goalY)
   let compareX 0
   let compareY 0
+  
+  let d 0
   
   ifelse (otherGoalX >= abs(goalX))
   [set compareX goalX]
@@ -94,21 +112,21 @@ to seek-pos
       [ifelse goalX > 0
         [ifelse (otherGoalX > goalX)
           [ifelse(heading = 90)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 90]
           ]
           [ifelse(heading = 270)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 270]
           ]
         ]
         [ifelse (otherGoalX > abs(goalX))
           [ifelse(heading = 270)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 270]
           ]
           [ifelse(heading = 90)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 90]
           ]
         ]
@@ -116,21 +134,21 @@ to seek-pos
       [ifelse goalY > 0
         [ifelse (otherGoalY > goalY)
           [ifelse(heading = 0)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 0]
           ]
           [ifelse(heading = 180)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 180]
           ]
         ]
         [ifelse (otherGoalY > abs(goalY))
           [ifelse(heading = 180)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 180]
           ]
           [ifelse(heading = 0)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 0]
           ]
         ]
@@ -140,21 +158,21 @@ to seek-pos
       [ifelse goalX > 0
         [ifelse (otherGoalX > goalX)
           [ifelse(heading = 90)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 90]
           ]
           [ifelse(heading = 270)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 270]
           ]
         ]
         [ifelse (otherGoalX > abs(goalX))
           [ifelse(heading = 270)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 270]
           ]
           [ifelse(heading = 90)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 90]
           ]
         ]
@@ -162,21 +180,21 @@ to seek-pos
       [ifelse goalY > 0
         [ifelse (otherGoalY > goalY)
           [ifelse(heading = 0)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 0]
           ]
           [ifelse(heading = 180)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 180]
           ]
         ]
         [ifelse (otherGoalY > abs(goalY))
           [ifelse(heading = 180)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 180]
           ]
           [ifelse(heading = 0)
-            [if (free-floor-ahead?) [move-ahead]]
+            [if (free-floor-ahead?) [set d patch-ahead 1]]
             [set heading 0]
           ]
         ]
@@ -185,6 +203,8 @@ to seek-pos
      
     if (xcor = item 0 last-rh-pos) and (ycor = item 1 last-rh-pos)
        [set last-rh-pos []]
+       
+    report d
 end
 
 

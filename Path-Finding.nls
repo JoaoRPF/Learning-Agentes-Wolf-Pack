@@ -31,7 +31,8 @@ to-report find-path [actual-turtle]
        set closed lput current-patch closed            ;;; add current patch to closed list
        
        ;;; explore the north, south, east and west neighbors
-
+       ;print current-patch
+       ;ask current-patch [print has-wolf]
        ask current-patch
        [ ifelse any? redHoods-on neighbors4                                  ;;; if we already are next to redhood, stop
          [set search-completed? true]

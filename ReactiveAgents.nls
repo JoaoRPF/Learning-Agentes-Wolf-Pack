@@ -1,13 +1,15 @@
 ;;;
 ;;;  Robot's updating procedure, which defines the rules of its behaviors
 ;;;
-to reactive-wolf-loop
+to-report reactive-wolf-loop
 
   let rand random 10
+  let d 0
+  
   ifelse redHood-in-sight-90?
   [
     if free-floor-ahead?
-      [move-ahead]
+      [set d patch-ahead 1]
    ]
   [
     ifelse redHood-in-sight-270?
@@ -25,7 +27,7 @@ to reactive-wolf-loop
           ]
           [
             ifelse (rand <= 5)
-            [move-ahead]
+            [set d patch-ahead 1]
             [ifelse (rand <= 7.5)
               [rotate-left]
               [rotate-right]
@@ -37,6 +39,11 @@ to reactive-wolf-loop
   ifelse redHood-in-sight-360?
      [set color orange]
      [set color blue]
+     
+    ifelse(patch-ahead 1 = d)
+    [report d]
+    [ if (d != 0) [face d]
+      report 0]
 end
 
 
@@ -92,6 +99,14 @@ end
 to-report redHood-in-sight-360?
   let goal redHoods in-cone MAX_VISION 360
   report(any? goal)
+end
+
+;;;
+;;;check wolf in 360 degrees
+;;;
+to-report wolf-in-sight-360? [w]
+  let goal wolfs in-cone MAX_VISION 360
+  report (any? goal = w)
 end
 
 ;;;
@@ -154,6 +169,8 @@ end
 to set-adjacent-position-occupied
   let redhood-x [xcor] of turtle 0
   let redhood-y [ycor] of turtle 0
+  
+  ask patch-here [set has-wolf 1]
   
   let dif-x redhood-x - xcor
   let dif-y redhood-y - ycor

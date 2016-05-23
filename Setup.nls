@@ -1,7 +1,7 @@
 ;;;
 ;;;  Global variables and constants
 ;;;
-globals [averageSteps totalSteps episodes ROOM_FLOOR WALL]
+globals [NUM-ACTIONS ACTION-LIST epsilon totalCollisions collisions averageSteps totalSteps episodes ROOM_FLOOR WALL]
 
 ;;;
 ;;;  Declare two types of turtles
@@ -19,7 +19,11 @@ patches-own [kind has-wolf parent-patch f g h ]
 ;;;
 ;;; my-last-adjacent is a number 1(north), 2(south), 3(east) and 4(west) that informs if i'm close to a redhood and where. If 0 i'm not close
 ;;;
-wolfs-own [last-rh-pos my-last-adjacent have-goal? goal-x goal-y best-path open closed] 
+wolfs-own [in-same-pos last-rh-pos my-last-adjacent have-goal? goal-x goal-y best-path open closed Q-values1 Q-values2 Q-values3 reward total-reward
+pack-members
+pre-x-W1 pre-y-W1 pre-x-R pre-y-R
+pre-x-W2 pre-y-W2 
+pre-x-W3 pre-y-W3 ] 
 redHoods-own [north south east west]
 
 ;;;
@@ -36,7 +40,12 @@ to reset
   set-globals
   setup-patches
   setup-turtles
-  ;;ask wolfs [init-wolf]
+  if Agent-Mode = "Learning"
+   [ask wolfs[set Q-values1 get-initial-Q-values
+    set Q-values2 get-initial-Q-values
+    set Q-values3 get-initial-Q-values
+    set reward 0
+    set total-reward 0 ]]
 end
 
 ;;;
@@ -49,10 +58,14 @@ to restart
   ;; of the procedure.)
   ;;__clear-all-and-reset-ticks
   clear-patches
-  clear-turtles
+  ifelse (Agent-Mode = "Learning")
+    [set-new-positions]
+    [clear-turtles
+     setup-turtles]
   reset-ticks
+  set totalCollisions (totalCollisions + collisions)
+  set collisions 0
   setup-patches
-  setup-turtles
   ;;ask wolfs [init-wolf]
 end
 
@@ -77,7 +90,9 @@ to setup-turtles
 
   set-default-shape wolfs "default"
 
-  create-wolfs 4
+  create-wolfs 4 [
+    set pack-members [who] of other wolfs
+  ]
 
   ;; set wolf 1
   ask turtle 1 [set color blue]
@@ -188,9 +203,106 @@ end
 ;;;  Set global variables' values
 ;;;
 to set-globals
+  set totalCollisions 0
+  set collisions 0
   set averageSteps 0
   set totalSteps 0
   set episodes 0
   set ROOM_FLOOR 0
   set WALL 1
+  
+    ; defines list of actions as (x y) move increments
+  set ACTION-LIST (list
+    list 0 0    ; no-move
+    list 0 1    ; N north
+    list 0 -1   ; S south
+    list 1 0    ; E east
+    list -1 0   ; W west
+    )
+  
+    ; defines the number of available actions from above
+  set NUM-ACTIONS 5
+end
+
+to set-new-positions
+  let px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  let py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+
+  let p patch px py
+
+  while [any? turtles-on p]
+  [set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set p patch px py]
+
+  ask turtle 2 [set xcor px]
+  ask turtle 2 [set ycor py]
+  ask turtle 2 [set heading 90]
+  ask turtle 2 [set last-rh-pos []]
+  ask turtle 2 [set shape "airplane"]
+  ask turtle 2 [set my-last-adjacent 0]
+  ask turtle 2 [set have-goal? 0]
+  ask turtle 2 [set goal-x 0]
+  ask turtle 2 [set goal-y 0]
+
+  ;; set wolf 3
+  ask turtle 3 [set color black]
+
+  set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+
+  set p patch px py
+
+  while [any? turtles-on p]
+  [set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set p patch px py]
+
+  ask turtle 3 [set xcor px]
+  ask turtle 3 [set ycor py]
+  ask turtle 3 [set heading 90]
+  ask turtle 3 [set last-rh-pos []]
+  ask turtle 3 [set shape "default"]
+  ask turtle 3 [set my-last-adjacent 0]
+  ask turtle 3 [set have-goal? 0]
+  ask turtle 3 [set goal-x 0]
+  ask turtle 3 [set goal-y 0]
+
+  ;; set wolf 4
+
+  set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+
+  set p patch px py
+
+  while [any? turtles-on p]
+  [set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set p patch px py]
+
+  ask turtle 4 [set color gray]
+  ask turtle 4 [set xcor px]
+  ask turtle 4 [set ycor py]
+  ask turtle 4 [set heading 90]
+  ask turtle 4 [set last-rh-pos []]
+  ask turtle 4 [set shape "turtle"]
+  ask turtle 4 [set my-last-adjacent 0]
+  ask turtle 4 [set have-goal? 0]
+  ask turtle 4 [set goal-x 0]
+  ask turtle 4 [set goal-y 0]
+  
+  while [any? turtles-on p]
+  [set px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
+  set p patch px py]
+
+  ask turtle 1 [set xcor px]
+  ask turtle 1 [set ycor py]
+  ask turtle 1 [set heading 90]
+  ask turtle 1 [set last-rh-pos []]
+  ask turtle 1 [set shape "arrow"]
+  ask turtle 1 [set my-last-adjacent 0]
+  ask turtle 1 [set have-goal? 0]
+  ask turtle 1 [set goal-x 0]
+  ask turtle 1 [set goal-y 0]
 end
