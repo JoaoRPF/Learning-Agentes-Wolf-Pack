@@ -4,9 +4,26 @@
 to-report reactive-wolf-loop
 
   let rand random 10
+  let initial-rand random 10
   let d 0
   
-  ifelse redHood-in-sight-90?
+  ifelse initial-rand <= 1
+  [ifelse not free-floor-ahead?
+    [ifelse (rand <= 5)
+      [rotate-left]
+      [rotate-right]
+    ]
+    [
+      ifelse (rand <= 5)
+        [set d patch-ahead 1]
+        [ifelse (rand <= 7.5)
+          [rotate-left]
+          [rotate-right]
+        ]
+    ]
+  ]
+  
+  [ifelse redHood-in-sight-90?
   [
     if free-floor-ahead?
       [set d patch-ahead 1]
@@ -35,6 +52,7 @@ to-report reactive-wolf-loop
           ]
         ]
       ]
+    ]
   ]
   ifelse redHood-in-sight-360?
      [set color orange]

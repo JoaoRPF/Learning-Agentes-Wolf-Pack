@@ -12,6 +12,7 @@ to go
   tick
   ;; hte robots act
   let parou false
+  let restarted false
 
   ask redHoods [
     if is-surrounded [set parou true]
@@ -20,20 +21,6 @@ to go
 
   if Agent-Mode = "Learning" and ticks >= 1501
   [set parou true]
-
-
-  if parou
-  [ifelse(episodes = 25)
-    [
-      set averageSteps (averageSteps / episodes)
-      stop]
-    [set episodes (episodes + 1)
-      set totalSteps ticks
-      set averageSteps averageSteps + totalSteps
-      restart
-      go
-    ]
-  ]
 
   let decisions [0 0 0 0]
 
@@ -62,9 +49,15 @@ to go
   ifelse (Agent-Mode = "Learning")
 
   [ask wolfs
-    [if (item (who - 1) decisions != 0)
+    [ if (item (who - 1) decisions != 0) and (not any? turtles-on item (who - 1) decisions) and not restarted
       [move-to item (who - 1 ) decisions]
     ]
+  ask wolfs [
+    set reward get-reward last-action
+    set total-reward (total-reward + reward)
+    update-Q-learning1 last-action
+    update-Q-learning2 last-action
+    update-Q-learning3 last-action]
   ]
 
   [ask wolfs
@@ -75,16 +68,45 @@ to go
     ]
   ]
 
+  if parou
+  [ifelse(episodes = 100000)
+    [
+      set restarted false
+      set averageSteps (averageSteps / episodes)
+      stop]
+    [set episodes (episodes + 1)
+      set totalSteps ticks
+      set averageSteps averageSteps + ((1 / episodes) * (totalSteps - averageSteps))
+      if (episodes >= 5000)
+      [ set episodes-after-learning episodes-after-learning + 1
+        set average-ticks-after-learning average-ticks-after-learning + ((1 / episodes-after-learning) * (ticks - average-ticks-after-learning))
+            ]
+      restart
+      set restarted true
+      reset-ticks
+      go
+    ]
+  ]
+
 end
 
 to-report is-surrounded
-  let c 0
+  ;let c 0
 
+  ;ask neighbors4
+  ;[if kind = WALL
+   ; [set c (c + 1)]]
+
+  ;report sum [count turtles-here] of neighbors4 = 4 - c
+  let num 0
   ask neighbors4
-  [if kind = WALL
-    [set c (c + 1)]]
+  [ let count-here count turtles-on self
+    ifelse count-here = 1
+      [set num num + 1]
+      [set num num]
+  ]
 
-  report sum [count turtles-here] of neighbors4 = 4 - c
+  report num = 4
 end
 
 
@@ -106,11 +128,11 @@ end
 GRAPHICS-WINDOW
 210
 10
-455
-236
-6
-6
-15.0
+495
+316
+2
+2
+55.0
 1
 10
 1
@@ -120,10 +142,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--6
-6
--6
-6
+-2
+2
+-2
+2
 0
 0
 1
@@ -148,9 +170,9 @@ NIL
 1
 
 BUTTON
-4
+3
 43
-68
+67
 76
 NIL
 Reset
@@ -190,7 +212,7 @@ MAX_VISION
 MAX_VISION
 1
 max-pxcor
-3
+2
 1
 1
 NIL
@@ -204,7 +226,7 @@ CHOOSER
 Agent-Mode
 Agent-Mode
 "Reactive" "Deliberative" "Learning"
-2
+0
 
 SLIDER
 12
@@ -222,10 +244,10 @@ NIL
 HORIZONTAL
 
 PLOT
-565
-98
-900
-315
+614
+89
+912
+344
 Pursuit Time
 Episode
 Ticks
@@ -237,7 +259,7 @@ true
 true
 "" ""
 PENS
-"default" 1.0 1 -13840069 true "" "plotxy (episodes) (totalSteps)"
+"default" 1.0 1 -13840069 true "" ";plotxy (episodes) (totalSteps)"
 
 MONITOR
 776
@@ -257,7 +279,7 @@ SWITCH
 426
 memory-last-pos
 memory-last-pos
-1
+0
 1
 -1000
 
@@ -270,7 +292,7 @@ Red-Hood-Move
 Red-Hood-Move
 0
 10
-4
+2
 1
 1
 NIL
@@ -292,12 +314,12 @@ true
 false
 "" ""
 PENS
-"collisions" 1.0 1 -2139308 true "" "plotxy (episodes) (collisions)"
+"collisions" 1.0 1 -2139308 true "" ";plotxy (episodes) (collisions)"
 
 MONITOR
 966
 94
-1061
+1074
 143
 NIL
 totalCollisions
@@ -306,25 +328,25 @@ totalCollisions
 12
 
 SLIDER
-265
-372
-437
-405
+633
+409
+805
+442
 discount-factor
 discount-factor
 0
 1
-0.99
+0.9
 0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-267
-325
-439
-358
+546
+361
+718
+394
 learning-rate
 learning-rate
 0
@@ -334,6 +356,54 @@ learning-rate
 1
 NIL
 HORIZONTAL
+
+SLIDER
+325
+385
+497
+418
+exploration-factor
+exploration-factor
+0
+1
+0
+0.1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+946
+37
+1019
+86
+NIL
+episodes
+0
+1
+12
+
+MONITOR
+544
+16
+752
+65
+NIL
+average-ticks-after-learning
+3
+1
+12
+
+MONITOR
+503
+74
+676
+123
+NIL
+episodes-after-learning
+0
+1
+12
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -678,7 +748,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.3
+NetLogo 5.2.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

@@ -1,7 +1,7 @@
 ;;;
 ;;;  Global variables and constants
 ;;;
-globals [NUM-ACTIONS ACTION-LIST epsilon totalCollisions collisions averageSteps totalSteps episodes ROOM_FLOOR WALL]
+globals [NUM-ACTIONS ACTION-LIST epsilon totalCollisions collisions averageSteps totalSteps episodes ROOM_FLOOR WALL average-ticks-after-learning episodes-after-learning]
 
 ;;;
 ;;;  Declare two types of turtles
@@ -20,7 +20,7 @@ patches-own [kind has-wolf parent-patch f g h ]
 ;;; my-last-adjacent is a number 1(north), 2(south), 3(east) and 4(west) that informs if i'm close to a redhood and where. If 0 i'm not close
 ;;;
 wolfs-own [in-same-pos last-rh-pos my-last-adjacent have-goal? goal-x goal-y best-path open closed Q-values1 Q-values2 Q-values3 reward total-reward
-pack-members
+pack-members last-action
 pre-x-W1 pre-y-W1 pre-x-R pre-y-R
 pre-x-W2 pre-y-W2 
 pre-x-W3 pre-y-W3 ] 
