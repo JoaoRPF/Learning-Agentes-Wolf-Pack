@@ -135,13 +135,13 @@ to redHood-loop
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
-10
-455
-211
-2
-2
-34.6
+300
+13
+624
+358
+5
+5
+28.55
 1
 10
 1
@@ -151,10 +151,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--2
-2
--2
-2
+-5
+5
+-5
+5
 0
 0
 1
@@ -162,10 +162,10 @@ ticks
 30.0
 
 BUTTON
-71
+72
+10
+135
 43
-134
-76
 Run
 go
 T
@@ -179,10 +179,10 @@ NIL
 1
 
 BUTTON
-3
+4
+10
+68
 43
-67
-76
 NIL
 Reset
 NIL
@@ -196,10 +196,10 @@ NIL
 1
 
 BUTTON
-140
+141
+10
+204
 43
-203
-76
 Step
 go
 NIL
@@ -213,35 +213,35 @@ NIL
 1
 
 SLIDER
-10
-171
-182
-204
+14
+91
+186
+124
 MAX_VISION
 MAX_VISION
 1
 max-pxcor
-2
+3
 1
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-17
-324
-196
-369
+14
+171
+187
+216
 Agent-Mode
 Agent-Mode
 "Reactive" "Reactive-Heading" "Deliberative" "Deliberative-Heading" "Learning"
 4
 
 SLIDER
-12
-117
-184
-150
+14
+50
+186
+83
 MAPBOUNDS
 MAPBOUNDS
 0
@@ -253,10 +253,10 @@ NIL
 HORIZONTAL
 
 PLOT
-614
-89
-912
-344
+816
+173
+1114
+428
 Pursuit Time
 Episode
 Ticks
@@ -271,10 +271,10 @@ PENS
 "default" 1.0 1 -13840069 true "" ";plotxy (episodes) (totalSteps)"
 
 MONITOR
-776
-16
-877
-65
+1013
+114
+1114
+163
 Average Ticks
 averageSteps
 3
@@ -282,21 +282,21 @@ averageSteps
 12
 
 SWITCH
-18
-393
-166
-426
+15
+222
+187
+255
 memory-last-pos
 memory-last-pos
-1
+0
 1
 -1000
 
 SLIDER
-15
-255
-187
-288
+14
+131
+186
+164
 Red-Hood-Move
 Red-Hood-Move
 0
@@ -308,10 +308,10 @@ NIL
 HORIZONTAL
 
 PLOT
-966
-156
-1166
-306
+1123
+277
+1323
+427
 Number of Collisions
 Episode
 Collisions
@@ -326,10 +326,10 @@ PENS
 "collisions" 1.0 1 -2139308 true "" ";plotxy (episodes) (collisions)"
 
 MONITOR
-966
-94
-1074
-143
+1121
+214
+1229
+263
 NIL
 totalCollisions
 0
@@ -337,10 +337,10 @@ totalCollisions
 12
 
 SLIDER
-633
-409
-805
-442
+17
+302
+189
+335
 discount-factor
 discount-factor
 0
@@ -352,10 +352,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-546
-361
-718
-394
+18
+419
+190
+452
 learning-rate
 learning-rate
 0
@@ -367,10 +367,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-388
-433
-560
-466
+646
+73
+786
+106
 exploration-factor
 exploration-factor
 0
@@ -382,10 +382,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-946
-37
-1019
-86
+687
+11
+760
+60
 NIL
 episodes
 0
@@ -393,10 +393,10 @@ episodes
 12
 
 MONITOR
-544
-16
-752
-65
+815
+114
+1010
+163
 NIL
 average-ticks-after-learning
 3
@@ -404,10 +404,10 @@ average-ticks-after-learning
 12
 
 MONITOR
-503
-74
-676
-123
+814
+59
+1009
+108
 NIL
 episodes-after-learning
 0
@@ -415,10 +415,10 @@ episodes-after-learning
 12
 
 SLIDER
-849
+18
+380
+190
 413
-1021
-446
 MAX-TICKS
 MAX-TICKS
 0
@@ -430,10 +430,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-513
-176
-622
-225
+1012
+59
+1113
+108
 NIL
 times-finished
 0
@@ -441,10 +441,10 @@ times-finished
 12
 
 SWITCH
-282
-405
-410
-438
+207
+400
+335
+433
 print-turtle
 print-turtle
 1
@@ -452,10 +452,10 @@ print-turtle
 -1000
 
 SWITCH
-348
-331
-475
-364
+343
+400
+470
+433
 print-plane
 print-plane
 1
@@ -463,10 +463,10 @@ print-plane
 -1000
 
 SWITCH
-228
-276
-364
-309
+615
+400
+751
+433
 print-default
 print-default
 1
@@ -474,10 +474,10 @@ print-default
 -1000
 
 SWITCH
-397
-243
-526
-276
+478
+400
+607
+433
 print-arrow
 print-arrow
 1
@@ -485,10 +485,10 @@ print-arrow
 -1000
 
 SLIDER
-565
-292
-773
-325
+18
+342
+190
+375
 episodes-for-learning
 episodes-for-learning
 0
@@ -842,7 +842,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2.1
+NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
