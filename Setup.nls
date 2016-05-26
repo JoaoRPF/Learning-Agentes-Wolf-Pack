@@ -1,7 +1,8 @@
 ;;;
 ;;;  Global variables and constants
 ;;;
-globals [NUM-ACTIONS ACTION-LIST epsilon totalCollisions collisions averageSteps totalSteps episodes ROOM_FLOOR WALL average-ticks-after-learning episodes-after-learning]
+globals [NUM-ACTIONS ACTION-LIST epsilon totalCollisions collisions averageSteps totalSteps episodes ROOM_FLOOR WALL 
+  times-finished average-ticks-after-learning episodes-after-learning]
 
 ;;;
 ;;;  Declare two types of turtles
@@ -74,6 +75,18 @@ end
 ;;;
 to setup-turtles
 
+   ask wolfs[
+    set last-action -1
+  set pre-x-W1 -1
+  set pre-y-W1 -1
+  set pre-x-W2 -1
+  set pre-y-W2 -1
+  set pre-x-W3 -1
+  set pre-y-W3 -1
+  set pre-x-R -1
+  set pre-y-R -1
+  set reward 0]
+   
    set-default-shape redHoods "default"
 
   create-redHoods 1
@@ -225,6 +238,18 @@ to set-globals
 end
 
 to set-new-positions
+  ask wolfs[
+    set last-action -1
+  set pre-x-W1 -1
+  set pre-y-W1 -1
+  set pre-x-W2 -1
+  set pre-y-W2 -1
+  set pre-x-W3 -1
+  set pre-y-W3 -1
+  set pre-x-R -1
+  set pre-y-R -1
+  set reward 0]
+  
   let px ((0 - random MAPBOUNDS) + random MAPBOUNDS)
   let py ((0 - random MAPBOUNDS) + random MAPBOUNDS)
 

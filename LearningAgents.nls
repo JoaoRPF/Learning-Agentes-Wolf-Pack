@@ -183,12 +183,12 @@ to-report get-reward [action]
   ask turtle 0[
     ifelse (is-surrounded)
       [set rew 1]
-      [ifelse (ticks >= 1500)
+      [ifelse (ticks >= MAX-TICKS)
         [set rew -0.1]
         [set rew 0]
     ]
   ]
-  ;if (rew = 0) and not wolf-adjacent-to-Redhood? [set rew -0.2]
+  ;if (rew = 0) and wolf-adjacent-to-Redhood? [set rew 0.1]
   ;if (rew = 0) and wolf-adjacent-to-wolfs [set rew -0.1]
   
   report rew
@@ -262,6 +262,51 @@ to update-Q-learning1 [action]
   ;let new-Q-value previous-Q-value + (learning-rate * (reward + discount-factor * get-max-Q-value xW yW xR yR 1) - previous-Q-value)
     
   set-Q-value pre-x-W1 pre-y-W1 pre-x-R pre-y-R action new-Q-value 1
+  
+;  let xW2 limit
+;  let yW2 limit
+;  
+;  if (wolf-in-sight-360? item 1 pack-members)[
+;    set xW2 xcor - [xcor] of (turtle item 1 pack-members)
+;    set yW2 ycor - [ycor] of (turtle item 1 pack-members)
+;    
+;    ifelse (xW2 >= 0 and xW2 <= MAX_VISION) [set xW2 xW2]
+;    [ifelse (xW2 < 0 and xW2 >= (0 - MAX_VISION)) [set xW2 abs (xW2) + MAX_VISION]
+;    [ifelse (xW2 > MAX_VISION) [set xW2 max-px-cor - xW2]
+;    [if (xW2 < (0 - MAX_VISION)) [set xW2 xW2 + max-px-cor + MAX_VISION]]]]
+;    
+;    ifelse (yW2 >= 0 and yW2 <= MAX_VISION) [set yW2 yW2]
+;    [ifelse (yW2 < 0 and yW2 >= (0 - MAX_VISION)) [set yW2 abs (yW2) + MAX_VISION]
+;    [ifelse (yW2 > MAX_VISION) [set yW2 max-py-cor - yW2]
+;    [if (yW2 < (0 - MAX_VISION)) [set yW2 yW2 + max-py-cor + MAX_VISION]]]]
+;  ]
+;  
+;  let previous-Q-value2 (get-Q-value pre-x-W2 pre-y-W2 pre-x-R pre-y-R action 1)
+;  let new-Q-value2 ((1 - learning-rate) * previous-Q-value2) + (learning-rate * (reward + discount-factor * get-max-Q-value xW2 yW2 xR yR 1))
+;  set-Q-value pre-x-W2 pre-y-W2 pre-x-R pre-y-R action new-Q-value2 1
+;  
+;  let xW3 limit
+;  let yW3 limit
+;  
+;  if (wolf-in-sight-360? item 2 pack-members)[
+;    set xW3 xcor - [xcor] of (turtle item 2 pack-members)
+;    set yW3 ycor - [ycor] of (turtle item 2 pack-members)
+;    
+;    ifelse (xW3 >= 0 and xW3 <= MAX_VISION) [set xW3 xW3]
+;    [ifelse (xW3 < 0 and xW3 >= (0 - MAX_VISION)) [set xW3 abs (xW3) + MAX_VISION]
+;    [ifelse (xW3 > MAX_VISION) [set xW3 max-px-cor - xW3]
+;    [if (xW3 < (0 - MAX_VISION)) [set xW3 xW3 + max-px-cor + MAX_VISION]]]]
+;    
+;    ifelse (yW3 >= 0 and yW3 <= MAX_VISION) [set yW3 yW3]
+;    [ifelse (yW3 < 0 and yW3 >= (0 - MAX_VISION)) [set yW3 abs (yW3) + MAX_VISION]
+;    [ifelse (yW3 > MAX_VISION) [set yW3 max-py-cor - yW3]
+;    [if (yW3 < (0 - MAX_VISION)) [set yW3 yW3 + max-py-cor + MAX_VISION]]]]
+;  ]
+;  
+;  let previous-Q-value3 (get-Q-value pre-x-W3 pre-y-W3 pre-x-R pre-y-R action 1)
+;  let new-Q-value3 ((1 - learning-rate) * previous-Q-value3) + (learning-rate * (reward + discount-factor * get-max-Q-value xW3 yW3 xR yR 1))
+;  set-Q-value pre-x-W3 pre-y-W3 pre-x-R pre-y-R action new-Q-value3 1
+  
 end
 
 
@@ -319,7 +364,7 @@ to update-Q-learning2 [action]
 
   ;let new-Q-value previous-Q-value + (learning-rate * (reward + discount-factor * get-max-Q-value xW yW xR yR 2) - previous-Q-value)
   
-  set-Q-value pre-x-W1 pre-y-W1 pre-x-R pre-y-R action new-Q-value 1
+  set-Q-value pre-x-W1 pre-y-W1 pre-x-R pre-y-R action new-Q-value 2
 end
 
 
@@ -398,11 +443,16 @@ to-report select-action [xW yW xR yR xW2 yW2 xW3 yW3]
     set i (i + 1)
   ]
   
+  if (who = 1 and print-arrow) [print totals]
+  if (who = 2 and print-plane) [print totals]
+  if (who = 3 and print-default) [print totals]
+  if (who = 4 and print-turtle) [print totals]
+  
   let rand random 10
   set rand rand / 10
   let action-index -1
   
-  ifelse (rand <= exploration-factor)
+  ifelse (rand < exploration-factor)
   [set action-index random 5]
   [ set i 0
     let max-value max totals
@@ -415,6 +465,7 @@ to-report select-action [xW yW xR yR xW2 yW2 xW3 yW3]
     ]
     
     set action-index one-of count-maxs]
+  ;print action-index
   
   report action-index
 end

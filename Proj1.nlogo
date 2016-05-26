@@ -12,15 +12,19 @@ to go
   tick
   ;; hte robots act
   let parou false
+  let success false
   let restarted false
 
   ask redHoods [
-    if is-surrounded [set parou true]
+    if is-surrounded [set parou true
+      set success true]
     redHood-loop
   ]
 
-  if Agent-Mode = "Learning" and ticks >= 1501
+  if Agent-Mode = "Learning" and ticks >= MAX-TICKS + 1
   [set parou true]
+
+
 
   let decisions [0 0 0 0]
 
@@ -31,6 +35,10 @@ to go
       [set decisions replace-item (who - 1) decisions deliberative-wolf-loop]
     if Agent-Mode = "Learning"
       [set decisions replace-item (who - 1) decisions learning-wolf-loop]
+    if Agent-Mode = "Reactive-Heading"
+      [set decisions replace-item (who - 1) decisions reactive-heading-wolf-loop]
+    if Agent-Mode = "Deliberative-Heading"
+      [set decisions replace-item (who - 1) decisions deliberative-heading-wolf-loop]
   ]
 
   let j 0
@@ -40,16 +48,17 @@ to go
     [if ( j != i)
       [if (item j decisions) = (item i decisions)
         [ if(item j decisions != 0) [set collisions (collisions + 1)]
-          set decisions replace-item i decisions 0
-          set decisions replace-item j decisions 0]]
-    set j (j + 1)]
+          ;set decisions replace-item i decisions 0
+          ;set decisions replace-item j decisions 0]]
+        ]]set j (j + 1)]
   set j 0
   set i (i + 1)]
 
   ifelse (Agent-Mode = "Learning")
 
   [ask wolfs
-    [ if (item (who - 1) decisions != 0) and (not any? turtles-on item (who - 1) decisions) and not restarted
+    [ ;if (item (who - 1) decisions != 0) and
+      if (not any? redHoods-on item (who - 1) decisions and not restarted)
       [move-to item (who - 1 ) decisions]
     ]
   ask wolfs [
@@ -61,11 +70,11 @@ to go
   ]
 
   [ask wolfs
-    [if (item (who - 1) decisions != 0)
-      [if (patch-ahead 1 = item (who - 1) decisions)
-        [if (free-floor-ahead?) [move-ahead
-          set in-same-pos 0]]]
-    ]
+    [ if (item (who - 1) decisions != 0) and (not any? turtles-on item (who - 1) decisions) and not restarted
+      [ask patch-here [set has-wolf 0]
+        move-to item (who - 1 ) decisions
+        ask patch-here [set has-wolf 1]
+        set in-same-pos 0]]
   ]
 
   if parou
@@ -75,9 +84,10 @@ to go
       set averageSteps (averageSteps / episodes)
       stop]
     [set episodes (episodes + 1)
+      if success [set times-finished times-finished + 1]
       set totalSteps ticks
       set averageSteps averageSteps + ((1 / episodes) * (totalSteps - averageSteps))
-      if (episodes >= 5000)
+      if (episodes >= episodes-for-learning)
       [ set episodes-after-learning episodes-after-learning + 1
         set average-ticks-after-learning average-ticks-after-learning + ((1 / episodes-after-learning) * (ticks - average-ticks-after-learning))
             ]
@@ -87,7 +97,6 @@ to go
       go
     ]
   ]
-
 end
 
 to-report is-surrounded
@@ -128,11 +137,11 @@ end
 GRAPHICS-WINDOW
 210
 10
-495
-316
+455
+211
 2
 2
-55.0
+34.6
 1
 10
 1
@@ -221,12 +230,12 @@ HORIZONTAL
 CHOOSER
 17
 324
-155
+196
 369
 Agent-Mode
 Agent-Mode
-"Reactive" "Deliberative" "Learning"
-0
+"Reactive" "Reactive-Heading" "Deliberative" "Deliberative-Heading" "Learning"
+4
 
 SLIDER
 12
@@ -237,7 +246,7 @@ MAPBOUNDS
 MAPBOUNDS
 0
 100
-22
+24
 1
 1
 NIL
@@ -279,7 +288,7 @@ SWITCH
 426
 memory-last-pos
 memory-last-pos
-0
+1
 1
 -1000
 
@@ -292,7 +301,7 @@ Red-Hood-Move
 Red-Hood-Move
 0
 10
-2
+0
 1
 1
 NIL
@@ -358,10 +367,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-325
-385
-497
-418
+388
+433
+560
+466
 exploration-factor
 exploration-factor
 0
@@ -404,6 +413,91 @@ episodes-after-learning
 0
 1
 12
+
+SLIDER
+849
+413
+1021
+446
+MAX-TICKS
+MAX-TICKS
+0
+1500
+1500
+10
+1
+NIL
+HORIZONTAL
+
+MONITOR
+513
+176
+622
+225
+NIL
+times-finished
+0
+1
+12
+
+SWITCH
+282
+405
+410
+438
+print-turtle
+print-turtle
+1
+1
+-1000
+
+SWITCH
+348
+331
+475
+364
+print-plane
+print-plane
+1
+1
+-1000
+
+SWITCH
+228
+276
+364
+309
+print-default
+print-default
+1
+1
+-1000
+
+SWITCH
+397
+243
+526
+276
+print-arrow
+print-arrow
+1
+1
+-1000
+
+SLIDER
+565
+292
+773
+325
+episodes-for-learning
+episodes-for-learning
+0
+10000
+5000
+100
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

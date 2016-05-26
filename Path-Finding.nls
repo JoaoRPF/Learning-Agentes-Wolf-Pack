@@ -75,8 +75,4 @@ end
 ;;;
 ;;; Move or rotate for the best position possible, having the a* path
 ;;;
-to do-action
-  ifelse (patch-ahead 1 = item 1 best-path)
-    [move-ahead]
-    [face item 1 best-path]
-end
+

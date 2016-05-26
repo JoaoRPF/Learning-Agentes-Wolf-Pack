@@ -1,7 +1,4 @@
-;;;
-;;;  Robot's updating procedure, which defines the rules of its behaviors
-;;;
-to-report reactive-wolf-loop
+to-report reactive-heading-wolf-loop
 
   let rand random 10
   let initial-rand random 10
@@ -54,14 +51,25 @@ to-report reactive-wolf-loop
       ]
     ]
   ]
+  report d
+end
+
+;;;
+;;;  Robot's updating procedure, which defines the rules of its behaviors
+;;;
+to-report reactive-wolf-loop
+
+  let d 0
+  
+  ifelse wolf-adjacent-to-redHood?
+    [do-nothing]
+    [set d random-next-patch]
+  
   ifelse redHood-in-sight-360?
      [set color orange]
      [set color blue]
      
-    ifelse(patch-ahead 1 = d)
-    [report d]
-    [ if (d != 0) [face d]
-      report 0]
+    report d
 end
 
 
@@ -155,9 +163,10 @@ end
 ;;;  Move the robot forward
 ;;;
 to move-ahead
-  ask patch-here [set has-wolf 0]
+  if (breed = wolfs) [ask patch-here [set has-wolf 0]]
   fd 1
-  ask patch-here [set has-wolf 1]
+  if (breed = wolfs) [ask patch-here [set has-wolf 1]]
+  ;ask patch-here [set has-wolf 1]
 end
 
 ;;;

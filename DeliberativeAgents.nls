@@ -1,7 +1,15 @@
-;;;
-;;;  Robot's updating procedure, which defines the rules of its behaviors
-;;;
-to-report deliberative-wolf-loop
+to-report random-next-patch
+  let my-neighbors []
+  set my-neighbors lput patch-here my-neighbors
+  set my-neighbors lput patch-at 1 0 my-neighbors
+  set my-neighbors lput patch-at -1 0 my-neighbors
+  set my-neighbors lput patch-at 0 1 my-neighbors
+  set my-neighbors lput patch-at 0 -1 my-neighbors
+  
+  report one-of my-neighbors
+end
+
+to-report deliberative-heading-wolf-loop
   let rand random 10
   let d 0
   
@@ -26,7 +34,7 @@ to-report deliberative-wolf-loop
         [find-shortest-path who
          set d item 1 best-path]
          [ifelse (not empty? last-rh-pos)
-            [set d seek-pos]
+            [set d seek-pos-heading]
             [ifelse ((rand <= 5) and free-floor-ahead?)
               [set d patch-ahead 1]
               [ifelse rand <= 7.5
@@ -53,15 +61,57 @@ to-report deliberative-wolf-loop
 end
 
 ;;;
-;;;  Turn robot to goal
+;;;  Robot's updating procedure, which defines the rules of its behaviors
 ;;;
-to turn-goal [x y]
-  let goalX x - xcor
-  let goalY y - ycor
+to-report deliberative-wolf-loop
+  let rand random 10
+  let d 0
+  
+  if (not empty? last-rh-pos) and (xcor = item 0 last-rh-pos ) and (ycor = item 1 last-rh-pos)
+     [set last-rh-pos []]
+  
+  ifelse wolf-adjacent-to-redHood?
+    [ set have-goal? 0
+      ifelse was-adjacent-to-redHood
+        [set d 0]
+        [set-adjacent-position-occupied]
+    ]
+    [ mark-as-not-adjacent
+      ifelse (in-same-pos >= 5)
+        [set d random-next-patch]
+        [ifelse redHood-in-sight-360?
+          [ find-shortest-path who
+            set d item 1 best-path]
+          [ifelse (not empty? last-rh-pos)
+            [set d seek-pos]
+            [set d random-next-patch]
+          ]
+        ]
+    ]
+      
+  ifelse redHood-in-sight-360?
+    [set color orange]
+    [ifelse (not empty? last-rh-pos)
+      [set color green]
+      [set color blue]]
+    
+    set in-same-pos (in-same-pos + 1)
+    
+    report d
+end
+
+;;;
+;;;  seek last known position for redHood
+;;;
+to-report seek-pos
+  let goalX item 0 last-rh-pos - xcor
+  let goalY item 1 last-rh-pos - ycor
   let otherGoalX (2 * max-pxcor + 1) - abs(goalX)
   let otherGoalY (2 * max-pycor + 1) - abs (goalY)
   let compareX 0
   let compareY 0
+  
+  let d 0
   
   ifelse (otherGoalX >= abs(goalX))
   [set compareX goalX]
@@ -71,24 +121,60 @@ to turn-goal [x y]
   [set compareY goalY]
   [set compareY otherGoalY]
   
-  if(memory-last-pos) [set last-rh-pos list x y]
-  
   ifelse abs(compareX) = abs(compareY)
     [let rand random 10
-      ifelse rand < 5
-        [facexy [xcor] of turtle 0 ycor]
-        [facexy xcor [ycor] of turtle 0]
-    ] 
+      ifelse (rand <= 5)
+      [ifelse goalX > 0
+        [ifelse (otherGoalX > goalX)
+          [set d patch-at 1 0]
+          [set d patch-at -1 0]
+        ]
+        [ifelse (otherGoalX > abs(goalX))
+          [set d patch-at -1 0]
+          [set d patch-at 1 0]
+        ]
+      ]
+      [ifelse goalY > 0
+        [ifelse (otherGoalY > goalY)
+          [set d patch-at 0 1]
+          [set d patch-at 0 -1]
+        ]
+        [ifelse (otherGoalY > abs(goalY))
+          [set d patch-at 0 -1]
+          [set d patch-at 0 1]
+        ]
+      ]
+    ]
     [ifelse abs(compareX) > abs(compareY)
-      [facexy [xcor] of turtle 0 ycor]
-      [facexy xcor [ycor] of turtle 0]
-     ]
+      [ifelse goalX > 0
+        [ifelse (otherGoalX > goalX)
+          [set d patch-at 1 0]
+          [set d patch-at -1 0]
+        ]
+        [ifelse (otherGoalX > abs(goalX))
+          [set d patch-at -1 0]
+          [set d patch-at 1 0]
+        ]
+      ]
+      [ifelse goalY > 0
+        [ifelse (otherGoalY > goalY)
+          [set d patch-at 0 1]
+          [set d patch-at 0 -1]
+        ]
+        [ifelse (otherGoalY > abs(goalY))
+          [set d patch-at 0 -1]
+          [set d patch-at 0 1]
+        ]
+      ]
+    ]
+  
+  if (xcor = item 0 last-rh-pos) and (ycor = item 1 last-rh-pos)
+    [set last-rh-pos []]
+  
+  report d
 end
 
-;;;
-;;;  seek last known position for redHood
-;;;
-to-report seek-pos
+to-report seek-pos-heading
   let goalX item 0 last-rh-pos - xcor
   let goalY item 1 last-rh-pos - ycor
   let otherGoalX (2 * max-pxcor + 1) - abs(goalX)
