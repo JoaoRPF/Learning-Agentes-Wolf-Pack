@@ -4,53 +4,78 @@ to-report reactive-heading-wolf-loop
   let initial-rand random 10
   let d 0
   
-  ifelse initial-rand <= 1
-  [ifelse not free-floor-ahead?
-    [ifelse (rand <= 5)
-      [rotate-left]
-      [rotate-right]
-    ]
-    [
-      ifelse (rand <= 5)
-        [set d patch-ahead 1]
-        [ifelse (rand <= 7.5)
+  if wolf-adjacent-to-redHood? 
+  [ifelse not wolf-here?
+    [do-nothing]
+    [if initial-rand <= 1
+      [ifelse not free-floor-ahead?
+        [ifelse (rand <= 5)
           [rotate-left]
           [rotate-right]
         ]
+        [
+          ifelse (rand <= 5)
+          [set d patch-ahead 1]
+          [ifelse (rand <= 7.5)
+            [rotate-left]
+            [rotate-right]
+          ]
+        ]
+      ]
     ]
   ]
   
-  [ifelse redHood-in-sight-90?
-  [
-    if free-floor-ahead?
-      [set d patch-ahead 1]
-   ]
-  [
-    ifelse redHood-in-sight-270?
-      [ifelse (rand <= 5)
-        [rotate-left]
-        [rotate-right]
+  ifelse initial-rand <= 1
+      [ifelse not free-floor-ahead?
+        [ifelse (rand <= 5)
+          [rotate-left]
+          [rotate-right]
+        ]
+        [
+          ifelse (rand <= 5)
+          [set d patch-ahead 1]
+          [ifelse (rand <= 7.5)
+            [rotate-left]
+            [rotate-right]
+          ]
+        ]
       ]
-      [ifelse redHood-in-sight-360?
-        [rotate-backwards]
-        ;; NAO ENCONTROU A REDHOOD 
-        [ifelse not free-floor-ahead?
+  
+      [ifelse redHood-in-sight-90?
+        [
+          if free-floor-ahead?
+          [set d patch-ahead 1]
+        ]
+        [
+          ifelse redHood-in-sight-270?
           [ifelse (rand <= 5)
             [rotate-left]
             [rotate-right]
           ]
-          [
-            ifelse (rand <= 5)
-            [set d patch-ahead 1]
-            [ifelse (rand <= 7.5)
-              [rotate-left]
-              [rotate-right]
+          [ifelse redHood-in-sight-360?
+            [rotate-backwards]
+          ;; NAO ENCONTROU A REDHOOD 
+            [ifelse not free-floor-ahead?
+              [ifelse (rand <= 5)
+                [rotate-left]
+                [rotate-right]
+              ]
+              [
+                ifelse (rand <= 5)
+                [set d patch-ahead 1]
+                [ifelse (rand <= 7.5)
+                  [rotate-left]
+                  [rotate-right]
+                ]
+              ]
             ]
           ]
         ]
       ]
-    ]
-  ]
+      
+      ifelse redHood-in-sight-360?
+     [set color orange]
+     [set color blue]
   report d
 end
 
@@ -62,7 +87,10 @@ to-report reactive-wolf-loop
   let d 0
   
   ifelse wolf-adjacent-to-redHood?
-    [do-nothing]
+    [ifelse not wolf-here?
+      [do-nothing]
+      [set d random-next-patch]
+    ]
     [set d random-next-patch]
   
   ifelse redHood-in-sight-360?
@@ -148,6 +176,16 @@ end
 ;;;
 to-report was-adjacent-to-redHood
   ifelse (my-last-adjacent > 0)
+    [report true]
+    [report false]
+end
+
+;;;
+;;; check if wolf in same position
+;;;
+to-report wolf-here?
+  let my-patch patch-here
+  ifelse (any? other wolfs-on my-patch)
     [report true]
     [report false]
 end

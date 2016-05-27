@@ -41,18 +41,20 @@ to go
       [set decisions replace-item (who - 1) decisions deliberative-heading-wolf-loop]
   ]
 
-  let j 0
-  let i 0
-  foreach decisions
-  [foreach decisions
-    [if ( j != i)
-      [if (item j decisions) = (item i decisions)
-        [ if(item j decisions != 0) [set collisions (collisions + 1)]
-          ;set decisions replace-item i decisions 0
-          ;set decisions replace-item j decisions 0]]
-        ]]set j (j + 1)]
-  set j 0
-  set i (i + 1)]
+  if (collision)
+  [let j 0
+    let i 0
+    foreach decisions
+    [foreach decisions
+      [if ( j != i)
+        [if (item j decisions) = (item i decisions)
+          [ if(item j decisions != 0) [set collisions (collisions + 1)]
+            set decisions replace-item i decisions 0
+            set decisions replace-item j decisions 0]]
+      set j (j + 1)]
+    set j 0
+    set i (i + 1)]
+  ]
 
   ifelse (Agent-Mode = "Learning")
 
@@ -70,11 +72,20 @@ to go
   ]
 
   [ask wolfs
-    [ if (item (who - 1) decisions != 0) and (not any? turtles-on item (who - 1) decisions) and not restarted
-      [ask patch-here [set has-wolf 0]
-        move-to item (who - 1 ) decisions
-        ask patch-here [set has-wolf 1]
-        set in-same-pos 0]]
+    [ ifelse (collision)
+      [if (item (who - 1) decisions != 0) and (not any? turtles-on item (who - 1) decisions) and not restarted
+        [ask patch-here [set has-wolf 0]
+          move-to item (who - 1 ) decisions
+          ask patch-here [set has-wolf 1]
+          set in-same-pos 0]
+      ]
+      [if (item (who - 1) decisions != 0) and not restarted
+        [ask patch-here [set has-wolf 0]
+          move-to item (who - 1 ) decisions
+          ask patch-here [set has-wolf 1]
+          set in-same-pos 0]
+      ]
+    ]
   ]
 
   if parou
@@ -137,11 +148,11 @@ end
 GRAPHICS-WINDOW
 300
 13
-624
-358
-5
-5
-28.55
+545
+271
+2
+2
+45.4
 1
 10
 1
@@ -151,10 +162,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--5
-5
--5
-5
+-2
+2
+-2
+2
 0
 0
 1
@@ -221,7 +232,7 @@ MAX_VISION
 MAX_VISION
 1
 max-pxcor
-3
+2
 1
 1
 NIL
@@ -235,7 +246,7 @@ CHOOSER
 Agent-Mode
 Agent-Mode
 "Reactive" "Reactive-Heading" "Deliberative" "Deliberative-Heading" "Learning"
-4
+1
 
 SLIDER
 14
@@ -493,11 +504,22 @@ episodes-for-learning
 episodes-for-learning
 0
 10000
-5000
+3800
 100
 1
 NIL
 HORIZONTAL
+
+SWITCH
+15
+259
+131
+292
+collision
+collision
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -842,7 +864,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.3.1
+NetLogo 5.2.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
