@@ -4,78 +4,59 @@ to-report reactive-heading-wolf-loop
   let initial-rand random 10
   let d 0
   
-  if wolf-adjacent-to-redHood? 
+  ifelse wolf-adjacent-to-redHood? 
   [ifelse not wolf-here?
     [do-nothing]
-    [if initial-rand <= 1
-      [ifelse not free-floor-ahead?
+    [ifelse initial-rand <= 1
+      [ifelse (rand <= 5)
+        [rotate-left]
+        [rotate-right]
+      ]
+      [ ifelse (rand <= 5)
+        [set d patch-ahead 1]
+        [ifelse (rand <= 7.5)
+          [rotate-left]
+          [rotate-right]
+        ]
+      ]
+    ]
+  ]
+  
+  [ifelse initial-rand <= 1
+    [ifelse (rand <= 5)
+        [set d patch-ahead 1]
+        [ifelse (rand <= 7.5)
+          [rotate-left]
+          [rotate-right]
+        ]
+    ]
+  
+    [ifelse redHood-in-sight-90?
+      [set d patch-ahead 1]
+      [ifelse redHood-in-sight-270?
         [ifelse (rand <= 5)
           [rotate-left]
           [rotate-right]
         ]
-        [
-          ifelse (rand <= 5)
-          [set d patch-ahead 1]
-          [ifelse (rand <= 7.5)
-            [rotate-left]
-            [rotate-right]
+        [ifelse redHood-in-sight-360?
+          [rotate-backwards]
+        ;; NAO ENCONTROU A REDHOOD 
+        
+          [ ifelse (rand <= 5)
+            [set d patch-ahead 1]
+            [ifelse (rand <= 7.5)
+              [rotate-left]
+              [rotate-right]
+            ]
           ]
         ]
       ]
     ]
   ]
   
-  ifelse initial-rand <= 1
-      [ifelse not free-floor-ahead?
-        [ifelse (rand <= 5)
-          [rotate-left]
-          [rotate-right]
-        ]
-        [
-          ifelse (rand <= 5)
-          [set d patch-ahead 1]
-          [ifelse (rand <= 7.5)
-            [rotate-left]
-            [rotate-right]
-          ]
-        ]
-      ]
-  
-      [ifelse redHood-in-sight-90?
-        [
-          if free-floor-ahead?
-          [set d patch-ahead 1]
-        ]
-        [
-          ifelse redHood-in-sight-270?
-          [ifelse (rand <= 5)
-            [rotate-left]
-            [rotate-right]
-          ]
-          [ifelse redHood-in-sight-360?
-            [rotate-backwards]
-          ;; NAO ENCONTROU A REDHOOD 
-            [ifelse not free-floor-ahead?
-              [ifelse (rand <= 5)
-                [rotate-left]
-                [rotate-right]
-              ]
-              [
-                ifelse (rand <= 5)
-                [set d patch-ahead 1]
-                [ifelse (rand <= 7.5)
-                  [rotate-left]
-                  [rotate-right]
-                ]
-              ]
-            ]
-          ]
-        ]
-      ]
-      
-      ifelse redHood-in-sight-360?
-     [set color orange]
-     [set color blue]
+  ifelse redHood-in-sight-360?
+    [set color orange]
+    [set color blue]
   report d
 end
 

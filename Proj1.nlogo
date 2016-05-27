@@ -41,7 +41,7 @@ to go
       [set decisions replace-item (who - 1) decisions deliberative-heading-wolf-loop]
   ]
 
-  if (collision)
+  if (not wolfs-in-same-pos)
   [let j 0
     let i 0
     foreach decisions
@@ -72,14 +72,14 @@ to go
   ]
 
   [ask wolfs
-    [ ifelse (collision)
+    [ ifelse (not wolfs-in-same-pos)
       [if (item (who - 1) decisions != 0) and (not any? turtles-on item (who - 1) decisions) and not restarted
         [ask patch-here [set has-wolf 0]
           move-to item (who - 1 ) decisions
           ask patch-here [set has-wolf 1]
           set in-same-pos 0]
       ]
-      [if (item (who - 1) decisions != 0) and not restarted
+      [if (item (who - 1) decisions != 0) and (not any? redHoods-on item (who - 1) decisions) and not restarted
         [ask patch-here [set has-wolf 0]
           move-to item (who - 1 ) decisions
           ask patch-here [set has-wolf 1]
@@ -246,7 +246,7 @@ CHOOSER
 Agent-Mode
 Agent-Mode
 "Reactive" "Reactive-Heading" "Deliberative" "Deliberative-Heading" "Learning"
-1
+3
 
 SLIDER
 14
@@ -299,7 +299,7 @@ SWITCH
 255
 memory-last-pos
 memory-last-pos
-0
+1
 1
 -1000
 
@@ -513,10 +513,10 @@ HORIZONTAL
 SWITCH
 15
 259
-131
+192
 292
-collision
-collision
+wolfs-in-same-pos
+wolfs-in-same-pos
 1
 1
 -1000

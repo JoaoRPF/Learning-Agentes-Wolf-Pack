@@ -17,10 +17,13 @@ to-report deliberative-heading-wolf-loop
      [set last-rh-pos []]
   
   ifelse wolf-adjacent-to-redHood?
-    [ set have-goal? 0
+    [ifelse not wolf-here? 
+      [set have-goal? 0
       ifelse was-adjacent-to-redHood
         [set d 0]
         [set-adjacent-position-occupied]
+      ]
+      [set d random-next-patch]
     ]
     [ mark-as-not-adjacent
       ifelse (in-same-pos >= 5)
@@ -67,14 +70,17 @@ to-report deliberative-wolf-loop
   let rand random 10
   let d 0
   
-  if (not empty? last-rh-pos) and (xcor = item 0 last-rh-pos ) and (ycor = item 1 last-rh-pos)
+  if (not empty? last-rh-pos) and (xcor = item 0 last-rh-pos) and (ycor = item 1 last-rh-pos)
      [set last-rh-pos []]
   
   ifelse wolf-adjacent-to-redHood?
-    [ set have-goal? 0
+    [ifelse not wolf-here? 
+      [set have-goal? 0
       ifelse was-adjacent-to-redHood
         [set d 0]
         [set-adjacent-position-occupied]
+      ]
+      [set d random-next-patch]
     ]
     [ mark-as-not-adjacent
       ifelse (in-same-pos >= 5)
